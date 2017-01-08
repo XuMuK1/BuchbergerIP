@@ -85,6 +85,50 @@ public class VectorBinomial extends Vector {
 		
 		return result;
 	}
+	
+	public int CompareTotally(Vector other) throws Exception{
+		
+		if(other.Size() != Size()){
+			throw new Exception("Vector Dimension Mismatch: othSize="+other.Size()+" vs thisSize="+Size());
+		}
+		
+		boolean isSet = false;
+		int result=0;//0: equal, 2: uncomparable,
+				   //1: this > other, -1: this < other
+		
+		for(int i=0; i < Size();i++){
+			
+			if (vec.get(i) < other.vec.get(i)){
+				
+				if(isSet){
+					if(result == 1){
+						return 2;//uncomparable then
+					}
+				}else{
+					isSet=true;
+					result=-1;
+				}
+				
+			}else{
+				
+				if (vec.get(i) > other.vec.get(i)){
+					
+					if(isSet){
+						if(result == -1){
+							return 2;//uncomparable then
+						}
+					}else{
+						isSet=true;
+						result=1;
+					}
+				}
+				
+			}
+			
+		}
+		
+		return result;
+	}
 
 	public int CompareTotally(int cons){
 		
@@ -627,28 +671,47 @@ public class VectorBinomial extends Vector {
 			
 			for (int i=0; i< N-1;i++){
 				for (int j=Integer.max(j0, i+1); j< N; j++){
-					System.out.println("i="+i+"  j="+j);
+					//System.out.println("i="+i+"  j="+j);
 					
 					VectorBinomial spair = new VectorBinomial(new ArrayList<Integer>(grobBasis.get(i).vec),grobBasis.get(i).firstValuableVariable);
 					spair.Add(grobBasis.get(j),-1);
 					spair.TransformToPlus(grading);
-					System.out.println("Spair:"+spair);
-					System.out.println("SpairSign:"+ spair.CompareBlockGLex(0, grading));
-					System.out.println("Basis"+grobBasis);
+					//System.out.println("Spair:"+spair);
+					//System.out.println("SpairSign:"+ spair.CompareBlockGLex(0, grading));
+					//System.out.println("Basis"+grobBasis);
 					spair.ReduceByList(grobBasis, grading);
 					if(spair.CompareTotally(0) != 0){
 						grobBasis.add(spair);
-						System.out.println("Added: "+spair.toString());
+						//System.out.println("Added: "+spair.toString());
 						added=true;
 					}
 				}
 			}
 			j0=N+1;
-			System.out.println(grobBasis.size());
+			//System.out.println(grobBasis.size());
 			
 		}
 		
 		return grobBasis;
 	}
+	
+	public static ArrayList<VectorBinomial> FilterBasis(ArrayList<VectorBinomial> basis){
+		
+		ArrayList<VectorBinomial> toRemain = new ArrayList<VectorBinomial>();
+		for (int i=0; i< basis.size(); i++){
+			int j;
+			for (j=0;j<basis.get(i).firstValuableVariable; j++){
+				if (basis.get(i).vec.get(j) !=0){
+					break;
+				}
+			}
+			if(j>=basis.get(i).firstValuableVariable){
+				toRemain.add(basis.get(i));
+			}
+		}
+		
+		return toRemain;
+	}
+	
 	
 }

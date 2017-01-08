@@ -107,9 +107,9 @@ public class TestingInterface {
 		//c=[0,3,2,0,0]
 		Vector grading= new Vector(new ArrayList<Integer>());
 		
-		grading.vec.add(1);
-		grading.vec.add(7);
-		grading.vec.add(5);
+		grading.vec.add(2);
+		grading.vec.add(19);
+		grading.vec.add(45);
 		grading.vec.add(11);
 		grading.vec.add(1);
 		grading.vec.add(1);
@@ -118,10 +118,10 @@ public class TestingInterface {
 		ArrayList<VectorBinomial> gs = new ArrayList<VectorBinomial>();
 		VectorBinomial g1= new VectorBinomial(new ArrayList<Integer>(),1);
 		g1.vec.add(0);//t
-		g1.vec.add(3);//s0
 		g1.vec.add(-1);//x1
 		g1.vec.add(0);//x2
 		g1.vec.add(0);//x3
+		g1.vec.add(1);//s0
 		g1.vec.add(1);//s1
 		g1.vec.add(0);//s2
 		g1.vec.add(0);//s3
@@ -129,10 +129,10 @@ public class TestingInterface {
 		
 		g1= new VectorBinomial(new ArrayList<Integer>(),1);
 		g1.vec.add(0);//t
-		g1.vec.add(2);//s0
 		g1.vec.add(0);//x1
 		g1.vec.add(-1);//x2
 		g1.vec.add(0);//x3
+		g1.vec.add(3);//s0
 		g1.vec.add(0);//s1
 		g1.vec.add(1);//s2
 		g1.vec.add(0);//s3
@@ -141,10 +141,10 @@ public class TestingInterface {
 		
 		g1= new VectorBinomial(new ArrayList<Integer>(),1);
 		g1.vec.add(0);//t
-		g1.vec.add(5);//s0
 		g1.vec.add(0);//x1
 		g1.vec.add(0);//x2
 		g1.vec.add(-1);//x3
+		g1.vec.add(5);//s0
 		g1.vec.add(0);//s1
 		g1.vec.add(0);//s2
 		g1.vec.add(1);//s3
@@ -168,10 +168,24 @@ public class TestingInterface {
 		
 		try {
 			ArrayList<VectorBinomial> grobBasis= VectorBinomial.BuchbergerAlgorithm(gs, grading);
-			System.out.println("GrobnerBasis");
+			System.out.println("GrobnerBasis(only with valuable variables)");
+			grobBasis = VectorBinomial.FilterBasis(grobBasis);
 			for (VectorBinomial v: grobBasis){
 				System.out.println(v.toString());
 			}
+			Vector feasSolution = new Vector(new ArrayList<Integer>());
+			feasSolution.vec.add(0);
+			feasSolution.vec.add(0);
+			feasSolution.vec.add(0);
+			feasSolution.vec.add(7);
+			feasSolution.vec.add(1);
+			feasSolution.vec.add(1);
+			feasSolution.vec.add(1);
+			
+			System.out.println("FeasibleSolution: "+feasSolution);
+			feasSolution.FindNormalForm(grobBasis);
+			System.out.println("OptimalSolution: "+feasSolution);
+			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

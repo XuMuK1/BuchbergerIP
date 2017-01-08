@@ -54,5 +54,28 @@ public class Vector {
 	
 	//****************************</Arithmetics>**************************//
 	
+	//****************************<BinomialReduction>**************************//
 	
+	public void FindNormalForm(ArrayList<VectorBinomial> lst) throws Exception{
+		if(vec.size() <= lst.get(0).Size()){
+			for(int i=0; i<lst.get(0).firstValuableVariable; i++){
+				vec.add(0, 0);
+			}
+		}
+		boolean reduced=true;
+		while(reduced){
+			reduced=false;
+			for(VectorBinomial g: lst){
+				if(g.Plus().CompareTotally(this)<=0){
+					this.Add((Vector)g,-1);
+					reduced=true;
+				}
+			}
+		}
+		
+		for(int i=0; i<lst.get(0).firstValuableVariable; i++){
+			vec.remove(0);
+		}
+		
+	}
 }
