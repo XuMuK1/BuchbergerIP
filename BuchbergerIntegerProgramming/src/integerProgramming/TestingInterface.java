@@ -194,8 +194,16 @@ public class TestingInterface {
 			feasSolution.vec.add(1);
 			
 			System.out.println("FeasibleSolution: "+feasSolution);
-			feasSolution.FindNormalForm(grobBasis);
-			System.out.println("OptimalSolution: "+feasSolution);
+			totalTime=0;
+			gbTime = System.nanoTime();
+			for (int i=0; i< 100; i++){
+				feasSolution.FindNormalForm(grobBasis);
+				long snt = System.nanoTime();
+				totalTime+= snt - gbTime;
+				gbTime = snt;
+			}
+			
+			System.out.println("was(20-37 e+03)exTime(aver over 100)="+totalTime/100+"nsec . OptimalSolution: "+feasSolution);
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
