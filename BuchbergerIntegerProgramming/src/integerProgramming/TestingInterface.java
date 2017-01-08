@@ -167,8 +167,19 @@ public class TestingInterface {
 		System.out.println(gs);
 		
 		try {
-			ArrayList<VectorBinomial> grobBasis= VectorBinomial.BuchbergerAlgorithm(gs, grading);
-			System.out.println("GrobnerBasis(only with valuable variables)");
+			
+			long gbTime = System.nanoTime();
+			long totalTime=0;
+			ArrayList<VectorBinomial> grobBasis = null;//TIME MEASUREMENT staff
+			for(int i=0; i<100; i++){
+				grobBasis = VectorBinomial.BuchbergerAlgorithm(gs, grading);
+				long snt=System.nanoTime();
+				totalTime+= snt-gbTime;
+				gbTime=snt;
+			}
+			
+			System.out.println("GrobnerBasis(only with valuable variables) timeForGB(aver over 100)="+totalTime/100+"nsec was: 1200-1600e+03");
+			
 			grobBasis = VectorBinomial.FilterBasis(grobBasis);
 			for (VectorBinomial v: grobBasis){
 				System.out.println(v.toString());

@@ -653,7 +653,22 @@ public class VectorBinomial extends Vector {
 	}
 	
 	
-	/*****************Grobner Bases*******************/
+	/*****************Grobner Bases
+	 * @throws Exception *******************/
+	public static boolean IsZeroReduction(VectorBinomial v1, VectorBinomial v2) throws Exception{
+		if(v1.Size() != v2.Size()){
+			throw new Exception("Dimension Mismatch");
+		}
+		
+		for(int i=0; i<v1.Size(); i++){
+			if(v1.get(i)>0){
+				if(v2.get(i)>0){
+					return false;
+				}
+			}
+		}
+		return true;
+	}
 	public static ArrayList<VectorBinomial> BuchbergerAlgorithm(ArrayList<VectorBinomial> basis, Vector grading) throws Exception{
 		ArrayList<VectorBinomial> grobBasis = new ArrayList<VectorBinomial>(basis);
 		
@@ -673,18 +688,22 @@ public class VectorBinomial extends Vector {
 				for (int j=Integer.max(j0, i+1); j< N; j++){
 					//System.out.println("i="+i+"  j="+j);
 					
-					VectorBinomial spair = new VectorBinomial(new ArrayList<Integer>(grobBasis.get(i).vec),grobBasis.get(i).firstValuableVariable);
-					spair.Add(grobBasis.get(j),-1);
-					spair.TransformToPlus(grading);
-					//System.out.println("Spair:"+spair);
-					//System.out.println("SpairSign:"+ spair.CompareBlockGLex(0, grading));
-					//System.out.println("Basis"+grobBasis);
-					spair.ReduceByList(grobBasis, grading);
-					if(spair.CompareTotally(0) != 0){
-						grobBasis.add(spair);
-						//System.out.println("Added: "+spair.toString());
-						added=true;
+					if(!IsZeroReduction(grobBasis.get(i), grobBasis.get(j))){
+						VectorBinomial spair = new VectorBinomial(new ArrayList<Integer>(grobBasis.get(i).vec),grobBasis.get(i).firstValuableVariable);
+						spair.Add(grobBasis.get(j),-1);
+						spair.TransformToPlus(grading);
+						//System.out.println("Spair:"+spair);
+						//System.out.println("SpairSign:"+ spair.CompareBlockGLex(0, grading));
+						//System.out.println("Basis"+grobBasis);
+						spair.ReduceByList(grobBasis, grading);
+						if(spair.CompareTotally(0) != 0){
+							grobBasis.add(spair);
+							//System.out.println("Added: "+spair.toString());
+							added=true;
+						}
 					}
+						
+					
 				}
 			}
 			j0=N+1;
