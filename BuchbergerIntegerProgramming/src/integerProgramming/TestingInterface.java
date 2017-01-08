@@ -247,7 +247,7 @@ public class TestingInterface {
         Vector grading = new Vector(new ArrayList<Integer>());
         ArrayList<VectorBinomial> gs = new ArrayList<VectorBinomial>();
         
-        grading.vec.add(0);//for s0
+        grading.vec.add(1);//for s0
 		for(int i=1; i <= numberOfItems; i++){
         	grading.vec.add(0);
         	grading.vec.add(0);
@@ -274,9 +274,17 @@ public class TestingInterface {
         	}
     		gs.add(g1);
     		
-    		grading.vec.set(i-1,1);
-    		grading.vec.set(i-1+numberOfItems,Integer.parseInt(parts[0])+1);
+    		grading.vec.set(i,1+g1.vec.get(1));
+    		grading.vec.set(i+numberOfItems,Integer.parseInt(parts[0])+1);
         }
+        System.out.println(grading);
+        VectorBinomial g1= new VectorBinomial(new ArrayList<Integer>(),1);//adding 1-tf
+        
+        for (int i=0;i<= numberOfItems;i++){
+        	g1.vec.add(-1);
+        	g1.vec.add(-1);
+        }
+        gs.add(g1);
 		
         try {
 			ArrayList<VectorBinomial> gB = VectorBinomial.FilterBasis(VectorBinomial.BuchbergerAlgorithm(gs, grading));
@@ -294,7 +302,7 @@ public class TestingInterface {
 			feasSolution.FindNormalForm(gB);
 			System.out.println("OptimalSolution: "+feasSolution);
 			
-			return (ArrayList<Integer>) feasSolution.vec.subList(1, numberOfItems);
+			return feasSolution.vec;
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -310,22 +318,17 @@ public class TestingInterface {
 		//VectorsAndOrders();//test orders and vectors TESTED
 		//GrobnerTest(); //test Buchberger TESTED
 		try {
-			int[] takenBaB = BaBKnapsack.solveProblem("./data/ks_50_0");
-			ArrayList<Integer> takeGB = SolveKnapsack("./data/ks_50_0");
+			int[] takenBaB = BaBKnapsack.solveProblem("./data/ks_4_0");
+			ArrayList<Integer> takeGB = SolveKnapsack("./data/ks_4_0");
 			System.out.println("Comparison");
-			for (int i=0; i< takeGB.size(); i++){
-				System.out.println(takenBaB[i]-takeGB.get(i));
+			for (int i=0; i< takenBaB.length; i++){
+				System.out.println(takenBaB[i]-takeGB.get(i+1));
 			}
 		} catch (Throwable e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		try {
-			SolveKnapsack("./data/ks_50_0");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
 		
 	}
 
