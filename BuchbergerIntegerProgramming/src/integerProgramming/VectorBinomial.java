@@ -520,7 +520,7 @@ public class VectorBinomial extends Vector {
 		//0: this = other
 	
 		if( grading.Size() != Size()-firstValuableVariable){
-			throw new Exception("Vector Dimension Mismatch");
+			throw new Exception("Vector Dimension Mismatch "+grading.Size()+" vs "+ (Size()-firstValuableVariable));
 		}
 		
 		//Block1 Lex for t's
@@ -707,7 +707,7 @@ public class VectorBinomial extends Vector {
 				}
 			}
 			j0=N+1;
-			//System.out.println(grobBasis.size());
+			System.out.println("GBSIze:"+grobBasis.size());
 			
 		}
 		

@@ -1,8 +1,14 @@
 package integerProgramming;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class TestingInterface {
+	
 	
 	private static void VectorsAndOrders(){
 		//tests vectors initialization and orders
@@ -212,35 +218,117 @@ public class TestingInterface {
 	}
 	
 	
-	//MAIN*******************************
-	public static void main(String[] args) {
+	private static ArrayList<Integer> SolveKnapsack(String fileName) throws IOException {
 		// TODO Auto-generated method stub
-		ArrayList<Integer> vec= new ArrayList<Integer>();
-		vec.add(-1);
-		vec.add(-2);
-		vec.add(0);
-		vec.add(-2);
-		vec.add(-2);
-		vec.add(0);
 		
-		Vector grading= new Vector(new ArrayList<Integer>());
+		if(fileName == null)
+            throw new FileNotFoundException("No such file");
+        
+        // read the lines out of the file
+        List<String> lines = new ArrayList<String>();
+
+        BufferedReader input =  new BufferedReader(new FileReader(fileName));
+        try {
+            String line = null;
+            while (( line = input.readLine()) != null){
+                lines.add(line);
+            }
+        }
+        finally {
+            input.close();
+        }
+        
+        
+        // parse the data in the file
+        String[] firstLine = lines.get(0).split("\\s+");
+        int numberOfItems = Integer.parseInt(firstLine[0]);
+        int capacity = Integer.parseInt(firstLine[1]);
 		
-		grading.vec.add(1);
-		grading.vec.add(7);
-		grading.vec.add(5);
-		grading.vec.add(1);
-		grading.vec.add(1);
+        Vector grading = new Vector(new ArrayList<Integer>());
+        ArrayList<VectorBinomial> gs = new ArrayList<VectorBinomial>();
+        
+        grading.vec.add(0);//for s0
+		for(int i=1; i <= numberOfItems; i++){
+        	grading.vec.add(0);
+        	grading.vec.add(0);
+        }
 		
-		VectorBinomial vb = new VectorBinomial(vec, 1);
-		try {
-			System.out.println(vb.CompareBlockGLex(0, grading));
+        for(int i=1; i <= numberOfItems; i++){
+        	String line = lines.get(i);
+        	String[] parts = line.split("\\s+");
+        	VectorBinomial g1= new VectorBinomial(new ArrayList<Integer>(),1);
+        	
+        	g1.vec.add(0);
+        	g1.vec.add(Integer.parseInt(parts[1]));
+        	
+        	for (int j=2; j<i+1; j++){
+        		g1.vec.add(0);
+        	}
+    		g1.vec.add(-1);
+    		for (int j=i+2; j<=numberOfItems+i; j++){
+        		g1.vec.add(0);
+        	}
+    		g1.vec.add(1);
+    		for (int j=1; j<=numberOfItems-i; j++){
+        		g1.vec.add(0);
+        	}
+    		gs.add(g1);
+    		
+    		grading.vec.set(i-1,1);
+    		grading.vec.set(i-1+numberOfItems,Integer.parseInt(parts[0])+1);
+        }
+		
+        try {
+			ArrayList<VectorBinomial> gB = VectorBinomial.FilterBasis(VectorBinomial.BuchbergerAlgorithm(gs, grading));
+			Vector feasSolution = new Vector(new ArrayList<Integer>());
+			
+			feasSolution.vec.add(capacity);//i.e. take NOTHING
+			for(int i=0; i< numberOfItems;i++){
+				feasSolution.vec.add(0);
+			}
+			for(int i=0; i< numberOfItems;i++){
+				feasSolution.vec.add(1);
+			}
+			
+			System.out.println("FeasibleSolution: "+feasSolution);
+			feasSolution.FindNormalForm(gB);
+			System.out.println("OptimalSolution: "+feasSolution);
+			
+			return (ArrayList<Integer>) feasSolution.vec.subList(1, numberOfItems);
+			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		//VectorsAndOrders();//test orders and vectors TESTED
-		GrobnerTest();
+		return null;     
 		
 	}
+	//MAIN*******************************
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		
+		//VectorsAndOrders();//test orders and vectors TESTED
+		//GrobnerTest(); //test Buchberger TESTED
+		try {
+			int[] takenBaB = BaBKnapsack.solveProblem("./data/ks_50_0");
+			ArrayList<Integer> takeGB = SolveKnapsack("./data/ks_50_0");
+			System.out.println("Comparison");
+			for (int i=0; i< takeGB.size(); i++){
+				System.out.println(takenBaB[i]-takeGB.get(i));
+			}
+		} catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			SolveKnapsack("./data/ks_50_0");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+
+	
 
 }
