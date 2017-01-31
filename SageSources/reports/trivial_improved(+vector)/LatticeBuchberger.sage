@@ -161,37 +161,27 @@ class LatticeBuchberger:
             return f0
 
 
-        def ConstructSpairs(B,order,block=0):#it is possible to optimize
+        def ConstructSpairs(B,order,oldI,block=0):#it is possible to optimize
             #construct all possible Spairs
 
             Blist=list(B)
             #print(Blist)
             Spairs=[]
             for i in range(0,len(Blist)-1):
-                for j in range(i+1,len(Blist)):
-                    if(order[0]=='lex'):
-                        if(CompareVectorsLex(Blist[i],Blist[j])==1):
+                
+                if(i<=oldI):
+                    begin=oldI+1
+                else:
+                    begin=i+1
+                    
+                for j in range(begin,len(Blist)):
+                    
+                    if(order[0]=='deglex'):
+                        if(CompareVectorsBlockDegLex(Blist[i],Blist[j],order[1],block)==1):
                             Spairs.append(Blist[i]-Blist[j])          
                         else: 
                             Spairs.append(Blist[j]-Blist[i])
-                    else:
-                        if(order[0]=='revlex'):
-                            if(CompareVectorsRevLex(Blist[i],Blist[j])==1):
-                                Spairs.append(Blist[i]-Blist[j])          
-                            else: 
-                                Spairs.append(Blist[j]-Blist[i])
-                        else:
-                            if(order[0]=='deglex'):
-                                if(CompareVectorsBlockDegLex(Blist[i],Blist[j],order[1],block)==1):
-                                    Spairs.append(Blist[i]-Blist[j])          
-                                else: 
-                                    Spairs.append(Blist[j]-Blist[i])
-                            else:
-                                if(order[0]=='degrevlex'):
-                                    if(CompareVectorsDegRevLex(Blist[i],Blist[j],order[1])==1):
-                                        Spairs.append(Blist[i]-Blist[j])          
-                                    else: 
-                                        Spairs.append(Blist[j]-Blist[i])
+
 
             return Spairs
 
@@ -205,14 +195,16 @@ class LatticeBuchberger:
 
             iterations=0
             wasReduction=True
+            oldI=0
             while(wasReduction):
                 #iterations=iterations+1
                 #if(iterations>4):
                 #    return
                 print(len(B))          
                 wasReduction=False
-
-                Spairs=ConstructSpairs(B,order,block)
+                
+                Spairs=ConstructSpairs(B,order,oldI,block)
+                oldI=len(B)-1
 
                 for i in range(0,len(Spairs)):
 
@@ -221,6 +213,7 @@ class LatticeBuchberger:
                     if(CompareVectorsTotally(rr,zero_vector(QQ,len(rr)))!=0):
                         B.append(rr)
                         wasReduction=True  
+                
 
             return B
 
