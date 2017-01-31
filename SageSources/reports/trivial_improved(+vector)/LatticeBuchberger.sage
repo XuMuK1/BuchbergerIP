@@ -176,6 +176,17 @@ class LatticeBuchberger:
                     
                 for j in range(begin,len(Blist)):
                     
+                    #disjoint initial support test
+                    toForget=True
+                    for k in range(0,len(Blist[i])):
+                        if(Blist[i][k]>0):
+                            if(Blist[j][k]>0):
+                                toForget=False
+                                break
+                    if(toForget):
+                        continue
+                    #ENDdisjoint initial support test    
+                    
                     if(order[0]=='deglex'):
                         if(CompareVectorsBlockDegLex(Blist[i],Blist[j],order[1],block)==1):
                             Spairs.append(Blist[i]-Blist[j])          
