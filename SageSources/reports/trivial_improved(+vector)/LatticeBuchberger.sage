@@ -1,7 +1,10 @@
+
 #REMEMBER!!!!!: all vectors are interpreted as covectors if not transposed
 #
 
 ## Service Functions
+
+
 class LatticeBuchberger:
     
     @staticmethod
@@ -129,7 +132,7 @@ class LatticeBuchberger:
 
         def ReduceVectorBySet(f,B,order=['lex'],block=0):
             #Weismantel,Ziegler,Urbaniak notation
-            #Ensure all b in B such that b > 0 w.r.to Lex order,
+            #Ensure all b in B such that b > 0 w.r.to BlockDegLex order,
             #same should hold for f
 
             f0=f[:]
@@ -336,12 +339,13 @@ class LatticeBuchberger:
         print("Buchberger.....")
         gB1=LatticeBuchberger(vecs,optimizationOrder,1)
         print(len(gB1))
-        print("Minimize....")
-        gB1=MinimizeGrobnerBasis(gB1)
-        print(len(gB1))
         print("Filtering...")
         gB1=FilterBasis(gB1,1)
         print(len(gB1))
+        print("Minimize....")
+        gB1=MinimizeGrobnerBasis(gB1)
+        print(len(gB1))
+        
         
         #for i in range(0,len(gB1)):
             #if(CompareVectorsDegLex(gB1[i],zero_vector(len(gB1[i])),optimizationOrder[1],1)<0):
