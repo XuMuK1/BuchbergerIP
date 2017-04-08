@@ -66,7 +66,10 @@ public class Vector {
 		while(reduced){
 			reduced=false;
 			for(VectorBinomial g: lst){
+				//System.out.println(g.Plus());
+				//System.out.println(g.Plus().CompareTotally(this));
 				if(g.Plus().CompareTotally(this)<=0){
+					//System.out.println("AAAAA");
 					this.Add((Vector)g,-1);
 					reduced=true;
 				}

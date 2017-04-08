@@ -312,17 +312,113 @@ public class TestingInterface {
 		
 	}
 	//MAIN*******************************
+	
+	private static ArrayList<Integer> SolveVertexCover(String fileName) throws IOException {
+		
+		if(fileName == null)
+            throw new FileNotFoundException("No such file");
+        
+        // read the lines out of the file
+        List<String> lines = new ArrayList<String>();
+
+        BufferedReader input =  new BufferedReader(new FileReader(fileName));
+        try {
+            String line = null;
+            while (( line = input.readLine()) != null){
+                lines.add(line);
+            }
+        }
+        finally {
+            input.close();
+        }
+        System.out.println(lines.size());
+        
+        // parse the data in the file
+        String[] firstLine = lines.get(0).split("\\s+");
+        int N = Integer.parseInt(firstLine[0]);
+        int E = Integer.parseInt(firstLine[1]);
+		
+        Vector grading = new Vector(new ArrayList<Integer>());
+        ArrayList<VectorBinomial> gs = new ArrayList<VectorBinomial>();
+        
+        
+		for(int i=1; i <= N; i++){
+        	grading.vec.add(Integer.parseInt(lines.get(i)));
+        	VectorBinomial g1= new VectorBinomial(new ArrayList<Integer>(),0);
+        	for(int j=0; j<N+E; j++){
+        		g1.vec.add(0);
+        	}
+        	g1.set(i-1,1);
+        	gs.add(g1);
+        	
+        }
+		
+		//ArrayList<ArrayList<Integer>> edges = new ArrayList<ArrayList<Integer>>();
+		
+        for(int i=N+1; i <N+E+1; i++){
+        	String line = lines.get(i);
+        	String[] parts = line.split("\\s+");
+        	
+        	gs.get(Integer.parseInt(parts[0])).set(i-N-1+N,1);
+        	gs.get(Integer.parseInt(parts[1])).set(i-N-1+N,1);
+        	grading.vec.add(0);//for slacks
+        }
+        //for(int i=0;i<gs.size();i++){
+		//	System.out.println(gs.get(i));
+		//}
+        //System.out.println(grading);
+		
+        try {
+			ArrayList<VectorBinomial> gB = VectorBinomial.BuchbergerAlgorithm(gs, grading);
+			//System.out.println("gB");
+			//for(int i=0;i<gB.size();i++){
+			//	System.out.println(gB.get(i));
+			//}
+
+			Vector feasSolution = new Vector(new ArrayList<Integer>());
+			
+			//i.e. take ALL
+			for(int i=0; i< N+E;i++){
+				feasSolution.vec.add(1);
+			}
+			
+			
+			System.out.println("FeasibleSolution: "+feasSolution);
+			feasSolution.FindNormalForm(gB);
+			System.out.println("OptimalSolution: "+feasSolution);
+			
+			return feasSolution.vec;
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+		
+	}
+	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		
 		//VectorsAndOrders();//test orders and vectors TESTED
 		//GrobnerTest(); //test Buchberger TESTED
-		try {
+		/*try {
 			int[] takenBaB = BaBKnapsack.solveProblem("./data/ks_4_0");
 			ArrayList<Integer> takeGB = SolveKnapsack("./data/ks_4_0");
 			System.out.println("Comparison");
 			for (int i=0; i< takenBaB.length; i++){
 				System.out.println(takenBaB[i]-takeGB.get(i+1));
+			}
+		} catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
+		
+		try {
+			ArrayList<Integer> vCovGB = SolveVertexCover("./data/vcov_10_14_1");
+			System.out.println("Comparison");
+			for (int i=0; i< vCovGB.size(); i++){
+				System.out.print(vCovGB.get(i)+" ");
 			}
 		} catch (Throwable e) {
 			// TODO Auto-generated catch block
