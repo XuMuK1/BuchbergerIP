@@ -655,7 +655,7 @@ public class VectorBinomial extends Vector {
 	
 	/*****************Grobner Bases
 	 * @throws Exception *******************/
-	public static boolean IsZeroReduction(VectorBinomial v1, VectorBinomial v2) throws Exception{
+	public static boolean BuchbCriterion(VectorBinomial v1, VectorBinomial v2) throws Exception{
 		if(v1.Size() != v2.Size()){
 			throw new Exception("Dimension Mismatch");
 		}
@@ -669,6 +669,7 @@ public class VectorBinomial extends Vector {
 		}
 		return true;
 	}
+	
 	public static ArrayList<VectorBinomial> BuchbergerAlgorithm(ArrayList<VectorBinomial> basis, Vector grading) throws Exception{
 		ArrayList<VectorBinomial> grobBasis = new ArrayList<VectorBinomial>(basis);
 		
@@ -688,7 +689,7 @@ public class VectorBinomial extends Vector {
 				for (int j=Integer.max(j0, i+1); j< N; j++){
 					//System.out.println("i="+i+"  j="+j);
 					
-					if(!IsZeroReduction(grobBasis.get(i), grobBasis.get(j))){
+					if(!BuchbCriterion(grobBasis.get(i), grobBasis.get(j))){
 						VectorBinomial spair = new VectorBinomial(new ArrayList<Integer>(grobBasis.get(i).vec),grobBasis.get(i).firstValuableVariable);
 						spair.Add(grobBasis.get(j),-1);
 						spair.TransformToPlus(grading);
@@ -712,6 +713,28 @@ public class VectorBinomial extends Vector {
 		}
 		
 		return grobBasis;
+	}
+	
+	public static ArrayList<VectorBinomial> MinimizeBasis(ArrayList<VectorBinomial> basis) throws Exception{
+		ArrayList<VectorBinomial> newBasis = new ArrayList<VectorBinomial>();
+		for (int i=0;i<basis.size();i++){
+			int j=0;
+			for (j=0;j<basis.size();j++){
+				if(i!=j){
+					VectorBinomial aa = basis.get(j).Plus();
+					aa.Add(basis.get(i).Plus(),-1);
+					
+					if(basis.get(j).Plus().CompareTotally(basis.get(i).Plus())<0){
+						break;
+					}
+				}
+			}
+			if(j==basis.size()){
+				newBasis.add(basis.get(i));
+			}
+		}
+		
+		return newBasis;
 	}
 	
 	public static ArrayList<VectorBinomial> FilterBasis(ArrayList<VectorBinomial> basis){

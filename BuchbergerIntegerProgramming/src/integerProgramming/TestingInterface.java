@@ -369,7 +369,8 @@ public class TestingInterface {
         //System.out.println(grading);
 		
         try {
-			ArrayList<VectorBinomial> gB = VectorBinomial.BuchbergerAlgorithm(gs, grading);
+			ArrayList<VectorBinomial> gB = VectorBinomial.MinimizeBasis(VectorBinomial.BuchbergerAlgorithm(gs, grading));
+			System.out.println("Minimized GB: "+gB.size());
 			//System.out.println("gB");
 			//for(int i=0;i<gB.size();i++){
 			//	System.out.println(gB.get(i));
@@ -415,7 +416,7 @@ public class TestingInterface {
 		}*/
 		
 		try {
-			ArrayList<Integer> vCovGB = SolveVertexCover("./data/vcov_10_14_1");
+			ArrayList<Integer> vCovGB = SolveVertexCover("./data/vcov_20_23_1");
 			System.out.println("Comparison");
 			for (int i=0; i< vCovGB.size(); i++){
 				System.out.print(vCovGB.get(i)+" ");
