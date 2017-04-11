@@ -14,12 +14,29 @@ public class Vector {
 		
 	}
 	
+	public static Vector copyVector(Vector vecc){
+		Vector vec1=new Vector(new ArrayList<>(vecc.vec));
+		return vec1;
+	}
 	
 	public int Size(){
 		return vec.size();
 	}
 	public String toString(){
 		return "Vector of length "+ Size() + ": "+vec.toString();
+	}
+	public String asMatrix(int m,int n) throws Exception{
+		if(m*n != this.vec.size()){
+			throw new Exception("Vector dimensionality mismatch: "+m*n+" versus vecSize "+this.vec.size());
+		}
+		String res="";
+		for(int i=0;i<m;i++){
+			for(int j=0;j<n;j++){
+				res=res+" "+vec.get(i*n+j);
+			}
+			res=res+'\n';
+		}
+		return res;
 	}
 	public int get(int i) throws IndexOutOfBoundsException{
 		return vec.get(i);
@@ -29,6 +46,14 @@ public class Vector {
 	}
 	
 	//****************************<Arithmetics>**************************//
+	public static Vector Mul(Vector v, int numb) throws Exception{
+		Vector res = new Vector(new ArrayList<Integer>());
+		for(int i = 0;i<v.vec.size(); i++){
+			res.vec.add(numb*v.vec.get(i));
+		}
+		return res;
+	}
+	
 	public void Add(Vector oth) throws Exception{
 		if(oth.Size() != vec.size()){
 			throw new Exception("Vector dimensionality mismatch");
@@ -50,7 +75,14 @@ public class Vector {
 		}
 	}
 	
-	
+	public boolean eq(Vector oth){
+		for(int i=0;i<oth.vec.size();i++){
+			if(oth.vec.get(i)!=this.vec.get(i)){
+				return false;
+			}
+		}
+		return true;
+	}
 	
 	//****************************</Arithmetics>**************************//
 	

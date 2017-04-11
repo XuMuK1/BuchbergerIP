@@ -313,6 +313,96 @@ public class TestingInterface {
 	}
 	//MAIN*******************************
 	
+	private static ArrayList<Integer> SolveMoney(){
+		
+		Vector grading = new Vector(new ArrayList<Integer>());
+		grading.vec.add(2);
+		grading.vec.add(2);
+		grading.vec.add(2);
+		grading.vec.add(2);
+		
+		grading.vec.add(1);
+		grading.vec.add(1);
+		grading.vec.add(1);
+		grading.vec.add(1);
+		
+		ArrayList<VectorBinomial> gs = new ArrayList<VectorBinomial>();
+		VectorBinomial g1= new VectorBinomial(new ArrayList<Integer>(),0);
+		
+		g1.vec.add(2);
+		g1.vec.add(-1);
+		g1.vec.add(0);
+		g1.vec.add(0);
+		g1.vec.add(-2);
+		g1.vec.add(1);
+		g1.vec.add(0);
+		g1.vec.add(0);
+		gs.add(g1);
+		
+		g1= new VectorBinomial(new ArrayList<Integer>(),0);
+		g1.vec.add(5);
+		g1.vec.add(0);
+		g1.vec.add(-1);
+		g1.vec.add(0);
+		g1.vec.add(-5);
+		g1.vec.add(0);
+		g1.vec.add(1);
+		g1.vec.add(0);
+		gs.add(g1);
+		
+		g1= new VectorBinomial(new ArrayList<Integer>(),0);
+		g1.vec.add(10);
+		g1.vec.add(0);
+		g1.vec.add(0);
+		g1.vec.add(-1);
+		g1.vec.add(-10);
+		g1.vec.add(0);
+		g1.vec.add(0);
+		g1.vec.add(1);
+		gs.add(g1);
+		
+		try {
+        	long startTime = System.currentTimeMillis();
+        	
+        	
+			ArrayList<VectorBinomial> gB = VectorBinomial.MinimizeBasis(VectorBinomial.BuchbergerAlgorithm(gs, grading));
+			System.out.println("Minimized GB: "+gB.size());
+			System.out.println("gB");
+			for(int i=0;i<gB.size();i++){
+				System.out.println(gB.get(i));
+			}
+
+			Vector feasSolution = new Vector(new ArrayList<Integer>());
+			
+			//i.e. take ALL
+			feasSolution.vec.add(500);
+			feasSolution.vec.add(0);
+			feasSolution.vec.add(0);
+			feasSolution.vec.add(0);
+			feasSolution.vec.add(100);
+			feasSolution.vec.add(100);
+			feasSolution.vec.add(50);
+			feasSolution.vec.add(10);
+			
+			
+			System.out.println("FeasibleSolution: "+feasSolution);
+			feasSolution.FindNormalForm(gB);
+			System.out.println("OptimalSolution: "+feasSolution);
+			long endTime   = System.currentTimeMillis();
+        	long totalTime = endTime - startTime;
+        	System.out.println("Execution Time:"+(double)(totalTime)/1000);//seconds
+			return feasSolution.vec;
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		return null;
+		
+	}
+	
 	private static ArrayList<Integer> SolveVertexCover(String fileName) throws IOException {
 		
 		if(fileName == null)
@@ -367,11 +457,14 @@ public class TestingInterface {
 		//	System.out.println(gs.get(i));
 		//}
         //System.out.println(grading);
-		
+		System.out.println("Trying to solve the problem: V="+N+" E="+E);
         try {
+        	long startTime = System.currentTimeMillis();
+        	
+        	
 			ArrayList<VectorBinomial> gB = VectorBinomial.MinimizeBasis(VectorBinomial.BuchbergerAlgorithm(gs, grading));
 			System.out.println("Minimized GB: "+gB.size());
-			//System.out.println("gB");
+			System.out.println("gB");
 			//for(int i=0;i<gB.size();i++){
 			//	System.out.println(gB.get(i));
 			//}
@@ -387,17 +480,175 @@ public class TestingInterface {
 			System.out.println("FeasibleSolution: "+feasSolution);
 			feasSolution.FindNormalForm(gB);
 			System.out.println("OptimalSolution: "+feasSolution);
-			
+			long endTime   = System.currentTimeMillis();
+        	long totalTime = endTime - startTime;
+        	System.out.println("Execution Time:"+(double)(totalTime)/1000);//seconds
 			return feasSolution.vec;
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+        
 		return null;
 		
 	}
 	
+private static ArrayList<Integer> SolveTransportation(String fileName) throws IOException {
+		
+		if(fileName == null)
+            throw new FileNotFoundException("No such file");
+        
+        // read the lines out of the file
+        List<String> lines = new ArrayList<String>();
+
+        BufferedReader input =  new BufferedReader(new FileReader(fileName));
+        try {
+            String line = null;
+            while (( line = input.readLine()) != null){
+                lines.add(line);
+            }
+        }
+        finally {
+            input.close();
+        }
+        System.out.println(lines.size());
+        
+        // parse the data in the file
+        String[] firstLine = lines.get(0).split("\\s+");
+        int M = Integer.parseInt(firstLine[0]);
+        int N = Integer.parseInt(firstLine[1]);
+		
+        Vector grading = new Vector(new ArrayList<Integer>());
+           
+		for(int i=1; i <= M*N; i++){
+        	grading.vec.add(Integer.parseInt(lines.get(i)));
+        }
+		
+		ArrayList<Integer> demands = new ArrayList<Integer>();
+		ArrayList<Integer> supplies = new ArrayList<Integer>();
+		
+		for(int i=0; i<N; i++){
+			demands.add(Integer.parseInt(lines.get(i+M*N+1)));
+		}
+		
+		for(int i=0; i<M; i++){
+			supplies.add(Integer.parseInt(lines.get(i+M*N+N+1)));
+		}
+		
+		//ArrayList<ArrayList<Integer>> edges = new ArrayList<ArrayList<Integer>>();
+		
+        //for(int i=0;i<gs.size();i++){
+		//	System.out.println(gs.get(i));
+		//}
+        //System.out.println(grading);
+		System.out.println("Trying to solve the problem: M="+M+" N="+N);
+        try {
+        	long startTime = System.currentTimeMillis();
+        	
+        	//basis construction
+        	ArrayList<VectorBinomial> gs = new ArrayList<VectorBinomial>();
+            
+            
+            for(int j=1;j<=M-1;j++){
+            	for(int i=0;i<j;i++){
+            		for(int l=1;l<=N-1;l++){
+                    	for(int k=0;k<l;k++){
+                    		VectorBinomial g1= new VectorBinomial(new ArrayList<Integer>(),0);
+                        	for(int x=0;x<M*N;x++){
+                        		g1.vec.add(0);
+                        	}
+                    		g1.set(i*N+l, 1);
+                    		g1.set(j*N+k, 1);
+                    		g1.set(i*N+k, -1);
+                    		g1.set(j*N+l, -1);
+                    		gs.add(g1);
+                    	}
+                    }
+            	}
+            }
+        	
+			ArrayList<VectorBinomial> gB = VectorBinomial.MinimizeBasis(VectorBinomial.BuchbergerAlgorithm(gs, grading));
+			System.out.println("Minimized GB: "+gB.size());
+			//System.out.println("gB");
+			//for(int i=0;i<gB.size();i++){
+			//	System.out.println(gB.get(i));
+			//}
+
+			Vector feasSolution = new Vector(new ArrayList<Integer>());
+			
+			//NW corner
+			for(int i=0; i< M*N;i++){
+				feasSolution.vec.add(0);
+			}
+			
+			int j=0;
+			for(int i=0;i<N;i++){
+				if(demands.get(i)<=supplies.get(j)){
+					feasSolution.set(j*N+i,demands.get(i));
+					supplies.set(j,supplies.get(j)-demands.get(i));
+					if(supplies.get(j)==0){
+						j++;
+					}
+				}else{
+					feasSolution.set(j*N+i,supplies.get(j));
+					demands.set(i,demands.get(i)-supplies.get(j));
+					j++;
+					
+					while(demands.get(i)>supplies.get(j)){
+						feasSolution.set(j*N+i,feasSolution.get(j*N+i)+supplies.get(j));
+						demands.set(i,demands.get(i)-supplies.get(j));
+						j++;
+					}
+					feasSolution.set(j*N+i,feasSolution.get(j*N+i)+demands.get(i));
+					supplies.set(j,supplies.get(j)-demands.get(i));
+					if(supplies.get(j)==0){
+						j++;
+					}
+				}
+			}
+			
+			
+			System.out.println("FeasibleSolution: ");
+			for(int i=0;i<M;i++){
+				for(j=0;j<N;j++){
+					System.out.print(feasSolution.get(i*N+j)+" ");
+				}
+				System.out.println();
+			}
+			
+			feasSolution.FindNormalForm(gB);
+			
+			System.out.println("OptimalSolution: "+feasSolution);
+			for(int i=0;i<M;i++){
+				for(j=0;j<N;j++){
+					System.out.print(feasSolution.get(i*N+j)+" ");
+				}
+				System.out.println();
+			}
+			
+			long endTime   = System.currentTimeMillis();
+        	long totalTime = endTime - startTime;
+        	System.out.println("Execution Time:"+(double)(totalTime)/1000);//seconds
+        	
+        	if(fileName=="./data/transp/really_easy"){
+        		System.out.println("ENUMERATION");
+        		
+        		ArrayList<Vector> feasSet = VectorBinomial.Enumerate(feasSolution, gB,3,3);
+        		System.out.println("Size of feasible set:"+feasSet.size());
+        	}
+        	
+			return feasSolution.vec;
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
+		return null;
+		
+	}
+
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		
@@ -415,8 +666,19 @@ public class TestingInterface {
 			e.printStackTrace();
 		}*/
 		
+		/*try {
+			ArrayList<Integer> vCovGB = SolveVertexCover("./data/gc/gc_20_1");
+			//ArrayList<Integer> vCovGB = SolveMoney();
+			System.out.println("Comparison");
+			for (int i=0; i< vCovGB.size(); i++){
+				System.out.print(vCovGB.get(i)+" ");
+			}
+		} catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
 		try {
-			ArrayList<Integer> vCovGB = SolveVertexCover("./data/vcov_20_23_1");
+			ArrayList<Integer> vCovGB = SolveTransportation("./data/transp/really_easy");
 			System.out.println("Comparison");
 			for (int i=0; i< vCovGB.size(); i++){
 				System.out.print(vCovGB.get(i)+" ");
@@ -425,6 +687,7 @@ public class TestingInterface {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
 		
 		
 	}

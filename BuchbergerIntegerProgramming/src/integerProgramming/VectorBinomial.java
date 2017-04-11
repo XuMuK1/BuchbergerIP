@@ -15,6 +15,8 @@ public class VectorBinomial extends Vector {
 		vec=vecc.vec;	
 	}
 	
+	
+
 	/******<Arithmetics>**************/
 	public static ArrayList<Integer> Add(VectorBinomial v1, VectorBinomial v2, int mul) throws Exception{
 		ArrayList<Integer> res = new ArrayList<Integer>();
@@ -680,6 +682,9 @@ public class VectorBinomial extends Vector {
 			basis.get(i).TransformToPlus(grading);
 		}
 		
+		long critPairsConsidered =0;
+		long zeroRed =0;
+		
 		while(added){
 			
 			added=false;
@@ -701,7 +706,10 @@ public class VectorBinomial extends Vector {
 							grobBasis.add(spair);
 							//System.out.println("Added: "+spair.toString());
 							added=true;
+						}else{
+							zeroRed++;
 						}
+						critPairsConsidered++;
 					}
 						
 					
@@ -711,6 +719,10 @@ public class VectorBinomial extends Vector {
 			System.out.println("GBSIze:"+grobBasis.size());
 			
 		}
+		System.out.println("SOLVED!");
+		System.out.println("Critical pairs considered: "+critPairsConsidered);
+		System.out.println("zero Reductions: "+zeroRed);
+		System.out.println("GBSize: "+grobBasis.size());
 		
 		return grobBasis;
 	}
@@ -755,5 +767,89 @@ public class VectorBinomial extends Vector {
 		return toRemain;
 	}
 	
+	public static ArrayList<Vector> Enumerate(Vector optimum, ArrayList<VectorBinomial> basis) throws Exception{
+		ArrayList<Vector> feasSet=new ArrayList<Vector>();
+		ArrayList<ArrayList<Integer>> adjacency = new ArrayList<ArrayList<Integer>>();
+		ArrayList<Vector> edges= new ArrayList<Vector>();
+		enumer(adjacency,edges, feasSet,optimum, basis,0);
+		for(int i=0; i<adjacency.size();i++){
+			System.out.println("TRAVEL");
+			System.out.println("from");
+			System.out.println(feasSet.get(adjacency.get(i).get(0)));
+			System.out.println("through");
+			System.out.println(edges.get(i));
+			System.out.println("to");
+			System.out.println(feasSet.get(adjacency.get(i).get(1)));
+		}
+		return feasSet;
+		
+	}
+	
+	public static ArrayList<Vector> Enumerate(Vector optimum, ArrayList<VectorBinomial> basis, int m, int n) throws Exception{
+		//WRITE IN MATRIX FORM M x N
+		ArrayList<Vector> feasSet=new ArrayList<Vector>();
+		ArrayList<ArrayList<Integer>> adjacency = new ArrayList<ArrayList<Integer>>();
+		ArrayList<Vector> edges= new ArrayList<Vector>();
+		enumer(adjacency,edges, feasSet,optimum, basis,0);
+		for(int i=0; i<adjacency.size();i++){
+			System.out.println("TRAVEL");
+			System.out.println("from");
+			System.out.println(feasSet.get(adjacency.get(i).get(0)).asMatrix(m, n));
+			System.out.println("through");
+			System.out.println(edges.get(i).asMatrix(m, n));
+			System.out.println("to");
+			System.out.println(feasSet.get(adjacency.get(i).get(1)).asMatrix(m, n));
+		}
+		return feasSet;
+		
+	}
+	
+	private static void enumer(ArrayList<ArrayList<Integer>> adjacency, ArrayList<Vector> edges, ArrayList<Vector> res, Vector current, ArrayList<VectorBinomial> basis, int prevIndex ) throws Exception{
+		if(res.size()==0){
+			System.out.println("START");
+		}else{
+			//System.out.println("to");
+			//System.out.println(current);
+		}
+		
+		res.add(Vector.copyVector(current));
+		int curIndex=res.size()-1;
+		for(int i=0;i< basis.size(); i++){
+			if(basis.get(i).CompareTotally(Vector.Mul(current, -1))==1){
+				current.Add(basis.get(i));
+				int j=0;
+				for(j=0;j<res.size();j++){
+					if(current.eq(res.get(j))){
+						break;
+					}
+				}
+				if(j<res.size()){
+					current.Add(basis.get(i),-1);
+					
+					adjacency.add(new ArrayList<>());
+					adjacency.get(adjacency.size()-1).add(curIndex);
+					adjacency.get(adjacency.size()-1).add(j);
+					
+					edges.add(basis.get(i));
+					
+					continue;
+				}
+				/*System.out.println("TRAVELING");
+				System.out.println("from");
+				System.out.println(current);*/
+				
+				adjacency.add(new ArrayList<>());
+				adjacency.get(adjacency.size()-1).add(curIndex);
+				adjacency.get(adjacency.size()-1).add(res.size());
+				
+				edges.add(basis.get(i));
+				
+				enumer(adjacency,edges,res,current,basis,curIndex);
+				current.Add(basis.get(i),-1);
+			}
+		}
+		return;
+		
+	}
 	
 }
