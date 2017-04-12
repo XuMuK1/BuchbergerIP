@@ -617,6 +617,7 @@ public class VectorBinomial extends Vector {
 	public void ReduceByList(ArrayList<VectorBinomial> lst,Vector grading) throws Exception{
 		boolean wasReduction=true;
 		while(wasReduction){
+			
 			wasReduction = false;
 			
 			//2.1
@@ -654,6 +655,54 @@ public class VectorBinomial extends Vector {
 		
 	}
 	
+	public void ReduceByList(ArrayList<VectorBinomial> lst,Vector grading,int V, int iter) throws Exception{
+		//with iteration criterion
+		boolean wasReduction=true;
+		while(wasReduction){
+			
+			wasReduction = false;
+			
+			if(IterationCriterion(this, V, iter)){//DROP IT
+				for(int i=0;i<this.vec.size();i++){
+					this.vec.set(i,0);
+					
+				}
+				return;
+			}
+			//2.1
+			for(int i=0; i<lst.size(); i++){
+			
+				if(lst.get(i).Plus().CompareTotally(Plus())<=0){
+					this.Add(lst.get(i), -1);
+					this.TransformToPlus(grading);
+					//System.out.println("2.1reduced: "+this);
+					wasReduction=true;
+					if(this.CompareTotally(0)==0){
+						return;//if suddenly we get 0
+					}
+					break;
+				}
+			}
+			/*if(!wasReduction){
+				for(int i=0; i<lst.size(); i++){
+					
+					if(lst.get(i).Minus().CompareTotally(Plus())<=0){
+						this.Add(lst.get(i));
+						this.TransformToPlus(grading);
+						System.out.println("2.2reduced: "+this);
+						wasReduction=true;
+						if(this.CompareTotally(0)==0){
+							return;//if suddenly we get 0
+						}
+						break;
+					}
+				}
+				
+			}	*/	
+			
+		}
+		
+	}
 	
 	/*****************Grobner Bases
 	 * @throws Exception *******************/
@@ -670,6 +719,84 @@ public class VectorBinomial extends Vector {
 			}
 		}
 		return true;
+	}
+	
+	private static boolean IterationCriterion(VectorBinomial spair,int V,int iter){
+		
+		if(iter>1){
+			int num=0;
+			//System.out.println(spair.vec);
+			for(int i=0;i<V;i++){
+				
+				if(spair.vec.get(i)!=0){
+					num++;
+				}
+			}
+			//System.out.println(num);
+			if(num<=iter){
+				return true; //DROP IT!
+			}
+		}
+		return false; // ok.....
+	}
+	
+	
+	public static ArrayList<VectorBinomial> BuchbergerAlgorithm(ArrayList<VectorBinomial> basis, Vector grading, int V) throws Exception{
+		ArrayList<VectorBinomial> grobBasis = new ArrayList<VectorBinomial>(basis);
+		//with iteration criterion
+		int j0=0;
+		boolean added = true;
+		
+		for(int i=0; i< basis.size(); i++){
+			basis.get(i).TransformToPlus(grading);
+		}
+		
+		long critPairsConsidered =0;
+		long zeroRed =0;
+		int iter=0;
+		while(added){
+			iter++;
+			added=false;
+			int N=grobBasis.size();
+			
+			for (int i=0; i< N-1;i++){
+				for (int j=Integer.max(j0, i+1); j< N; j++){
+					//System.out.println("i="+i+"  j="+j);
+					
+					if(!BuchbCriterion(grobBasis.get(i), grobBasis.get(j))){
+						
+						VectorBinomial spair = new VectorBinomial(new ArrayList<Integer>(grobBasis.get(i).vec),grobBasis.get(i).firstValuableVariable);
+						spair.Add(grobBasis.get(j),-1);
+						spair.TransformToPlus(grading);
+						if(!IterationCriterion(spair,V,iter)){
+							//System.out.println("Spair:"+spair);
+							//System.out.println("SpairSign:"+ spair.CompareBlockGLex(0, grading));
+							//System.out.println("Basis"+grobBasis);
+							spair.ReduceByList(grobBasis, grading, V, iter);
+							if(spair.CompareTotally(0) != 0){
+								grobBasis.add(spair);
+								//System.out.println("Added: "+spair.toString());
+								added=true;
+							}else{
+								zeroRed++;
+							}
+							critPairsConsidered++;
+						}
+					}
+						
+					
+				}
+			}
+			j0=N+1;
+			System.out.println("GBSIze:"+grobBasis.size());
+			
+		}
+		System.out.println("SOLVED!");
+		System.out.println("Critical pairs considered: "+critPairsConsidered);
+		System.out.println("zero Reductions: "+zeroRed);
+		System.out.println("GBSize: "+grobBasis.size());
+		
+		return grobBasis;
 	}
 	
 	public static ArrayList<VectorBinomial> BuchbergerAlgorithm(ArrayList<VectorBinomial> basis, Vector grading) throws Exception{

@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import gurobi.*;
+
 public class TestingInterface {
 	
 	
@@ -462,12 +464,12 @@ public class TestingInterface {
         	long startTime = System.currentTimeMillis();
         	
         	
-			ArrayList<VectorBinomial> gB = VectorBinomial.MinimizeBasis(VectorBinomial.BuchbergerAlgorithm(gs, grading));
+			ArrayList<VectorBinomial> gB = VectorBinomial.MinimizeBasis(VectorBinomial.BuchbergerAlgorithm(gs, grading,N));
 			System.out.println("Minimized GB: "+gB.size());
-			System.out.println("gB");
-			//for(int i=0;i<gB.size();i++){
-			//	System.out.println(gB.get(i));
-			//}
+			/*System.out.println("gB");
+			for(int i=0;i<gB.size();i++){
+				System.out.println(gB.get(i));
+			}*/
 
 			Vector feasSolution = new Vector(new ArrayList<Integer>());
 			
@@ -632,6 +634,10 @@ private static ArrayList<Integer> SolveTransportation(String fileName) throws IO
         	System.out.println("Execution Time:"+(double)(totalTime)/1000);//seconds
         	
         	if(fileName=="./data/transp/really_easy"){
+        		System.out.println("gB");
+    			for(int i=0;i<gB.size();i++){
+    				System.out.println(gB.get(i).asMatrix(3, 3));
+    			}
         		System.out.println("ENUMERATION");
         		
         		ArrayList<Vector> feasSet = VectorBinomial.Enumerate(feasSolution, gB,3,3);
@@ -649,6 +655,116 @@ private static ArrayList<Integer> SolveTransportation(String fileName) throws IO
 		
 	}
 
+
+	public static void SolveVCovWithGurobi(String fileName) throws IOException{
+		if(fileName == null)
+            throw new FileNotFoundException("No such file");
+        
+        // read the lines out of the file
+        List<String> lines = new ArrayList<String>();
+
+        BufferedReader input =  new BufferedReader(new FileReader(fileName));
+        try {
+            String line = null;
+            while (( line = input.readLine()) != null){
+                lines.add(line);
+            }
+        }
+        finally {
+            input.close();
+        }
+        System.out.println(lines.size());
+        
+        // parse the data in the file
+        String[] firstLine = lines.get(0).split("\\s+");
+        int N = Integer.parseInt(firstLine[0]);
+        int E = Integer.parseInt(firstLine[1]);
+		
+        Vector grading = new Vector(new ArrayList<Integer>());
+        ArrayList<VectorBinomial> gs = new ArrayList<VectorBinomial>();
+        
+        
+		for(int i=1; i <= N; i++){
+        	grading.vec.add(Integer.parseInt(lines.get(i)));
+        	VectorBinomial g1= new VectorBinomial(new ArrayList<Integer>(),0);
+        	for(int j=0; j<N+E; j++){
+        		g1.vec.add(0);
+        	}
+        	g1.set(i-1,1);
+        	gs.add(g1);
+        	
+        }
+		
+		ArrayList<ArrayList<Integer>> edges = new ArrayList<ArrayList<Integer>>();
+		
+        for(int i=N+1; i <N+E+1; i++){
+        	String line = lines.get(i);
+        	String[] parts = line.split("\\s+");
+        	
+        	edges.add(new ArrayList<Integer>());
+        	edges.get(edges.size()-1).add(Integer.parseInt(parts[0]));
+        	edges.get(edges.size()-1).add(Integer.parseInt(parts[1]));
+        }
+        //for(int i=0;i<gs.size();i++){
+		//	System.out.println(gs.get(i));
+		//}
+        //System.out.println(grading);
+		System.out.println("Trying to solve the problem: V="+N+" E="+E);
+		
+		try {
+			 
+			long startTime   = System.currentTimeMillis();
+        	
+		      GRBEnv    env   = new GRBEnv("mip1.log");
+		      GRBModel  model = new GRBModel(env);
+
+		      // VARIABLES
+			// a warehouse is either open or closed
+			ArrayList<GRBVar> open = new ArrayList<GRBVar>();
+			// which warehouse supplies a store
+			ArrayList<GRBVar> X = new ArrayList<GRBVar>();//client-warehouse connections
+		
+			for(int i=0; i< N; i++){
+				X.add(model.addVar(0.0, 1.0, grading.get(i), GRB.INTEGER, "x_"+i));
+			}
+			
+		      // OBJECTIVE is set
+			 model.set(GRB.IntAttr.ModelSense, GRB.MINIMIZE);
+
+			 //EDGE CONSTRAINTS
+			 for (int j = 0; j < E; j++) {
+			        GRBLinExpr ptot = new GRBLinExpr();
+			        
+			        ptot.addTerm(1, X.get(edges.get(j).get(0)));
+			        ptot.addTerm(1, X.get(edges.get(j).get(1)));
+
+			        model.addConstr(ptot, GRB.GREATER_EQUAL, 1, "edge" + j);
+			 }
+
+		
+		      // Optimize model
+			 
+			 model.getEnv().set(GRB.DoubleParam.TimeLimit, 3600); 
+			model.optimize();
+		
+			
+			System.out.println("SOLUTION");
+			for(int i=0;i<X.size();i++){
+				System.out.print(X.get(i).get(GRB.DoubleAttr.X)+" ");
+			}
+			long totalTime = System.currentTimeMillis() - startTime;
+			System.out.println("");
+			System.out.println("EXEC TIME: "+totalTime);
+		      // Dispose of model and environment
+		
+		      model.dispose();
+		      env.dispose();
+		
+		    } catch (GRBException e) {
+		      System.out.println("Error code: " + e.getErrorCode() + ". " +
+		                         e.getMessage());
+		    }
+	}
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		
@@ -666,18 +782,27 @@ private static ArrayList<Integer> SolveTransportation(String fileName) throws IO
 			e.printStackTrace();
 		}*/
 		
-		/*try {
-			ArrayList<Integer> vCovGB = SolveVertexCover("./data/gc/gc_20_1");
+		try {
+			ArrayList<Integer> vCovGB = SolveVertexCover("./data/vcov_20_23");
 			//ArrayList<Integer> vCovGB = SolveMoney();
 			System.out.println("Comparison");
-			for (int i=0; i< vCovGB.size(); i++){
-				System.out.print(vCovGB.get(i)+" ");
+			for (int i=0; i< 20; i++){
+				System.out.println(vCovGB.get(i));
 			}
 		} catch (Throwable e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+		
+		/*try {//the same vcover with gurobi
+			SolveVCovWithGurobi("./data/vcov_50_133");
+						
+		} catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}*/
-		try {
+		
+		/*try {
 			ArrayList<Integer> vCovGB = SolveTransportation("./data/transp/really_easy");
 			System.out.println("Comparison");
 			for (int i=0; i< vCovGB.size(); i++){
@@ -686,7 +811,7 @@ private static ArrayList<Integer> SolveTransportation(String fileName) throws IO
 		} catch (Throwable e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
 		
 		
 		
