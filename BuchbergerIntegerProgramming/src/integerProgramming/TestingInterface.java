@@ -423,7 +423,7 @@ public class TestingInterface {
         finally {
             input.close();
         }
-        System.out.println(lines.size());
+        //System.out.println(lines.size());
         
         // parse the data in the file
         String[] firstLine = lines.get(0).split("\\s+");
@@ -447,7 +447,7 @@ public class TestingInterface {
 		
 		//ArrayList<ArrayList<Integer>> edges = new ArrayList<ArrayList<Integer>>();
 		
-        for(int i=N+1; i <N+E+1; i++){
+        for(int i=N+1; i <=N+E; i++){
         	String line = lines.get(i);
         	String[] parts = line.split("\\s+");
         	
@@ -464,7 +464,10 @@ public class TestingInterface {
         	long startTime = System.currentTimeMillis();
         	
         	
-			ArrayList<VectorBinomial> gB = VectorBinomial.MinimizeBasis(VectorBinomial.BuchbergerAlgorithm(gs, grading,N));
+			ArrayList<VectorBinomial> gB = VectorBinomial.BuchbergerAlgorithm(gs, grading, N);
+			out+=""+gB.size();
+			gB=VectorBinomial.MinimizeBasis(gB);
+			out+=" & "+gB.size();
 			System.out.println("Minimized GB: "+gB.size());
 			/*System.out.println("gB");
 			for(int i=0;i<gB.size();i++){
@@ -485,7 +488,8 @@ public class TestingInterface {
 			long endTime   = System.currentTimeMillis();
         	long totalTime = endTime - startTime;
         	System.out.println("Execution Time:"+(double)(totalTime)/1000);//seconds
-			return feasSolution.vec;
+			out+=" & "+(double)(totalTime)/1000;
+        	return feasSolution.vec;
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -765,6 +769,7 @@ private static ArrayList<Integer> SolveTransportation(String fileName) throws IO
 		                         e.getMessage());
 		    }
 	}
+	private static String out="";
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		
@@ -783,12 +788,29 @@ private static ArrayList<Integer> SolveTransportation(String fileName) throws IO
 		}*/
 		
 		try {
-			ArrayList<Integer> vCovGB = SolveVertexCover("./data/vcov_20_23");
-			//ArrayList<Integer> vCovGB = SolveMoney();
-			System.out.println("Comparison");
-			for (int i=0; i< 20; i++){
-				System.out.println(vCovGB.get(i));
+			ArrayList<String> tests = new ArrayList<String>();
+			/*tests.add("./data/vcov_6_7");
+			tests.add("./data/vcov_10_14");
+			tests.add("./data/vcov_20_23");
+			tests.add("./data/vcov_20_33");
+			tests.add("./data/vcov_20_43");*/
+			tests.add("./data/vcov_50_63");
+			tests.add("./data/vcov_50_73");
+			
+			ArrayList<String> outs = new ArrayList<String>();
+			for(String test : tests){
+				out="";
+				ArrayList<Integer> vCovGB = SolveVertexCover(test);
+				outs.add(out);
+				String[] parts = test.split("_");
+				int V = Integer.parseInt(parts[1]);
+				//ArrayList<Integer> vCovGB = SolveMoney();
+				System.out.println("Comparison");
+				for (int i=0; i< V; i++){
+					System.out.print(vCovGB.get(i)+" ");
+				}
 			}
+			
 		} catch (Throwable e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
