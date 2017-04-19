@@ -1,0 +1,36 @@
+*************
+Critical pairs considered: 191
+zero Reductions: 189
+GBSize: 38
+*************
+Critical pairs considered: 457
+zero Reductions: 453
+GBSize: 64
+*************
+Critical pairs considered: 816
+zero Reductions: 813
+GBSize: 93
+*************
+Critical pairs considered: 421
+zero Reductions: 419
+GBSize: 62
+*************
+Critical pairs considered: 1033
+zero Reductions: 1026
+GBSize: 107
+*************
+Critical pairs considered: 2142
+zero Reductions: 2125
+GBSize: 167
+*************
+Critical pairs considered: 916
+zero Reductions: 907
+GBSize: 99
+*************
+Critical pairs considered: 2049
+zero Reductions: 2035
+GBSize: 164
+*************
+Critical pairs considered: 4830
+zero Reductions: 4783
+GBSize: 272

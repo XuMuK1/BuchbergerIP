@@ -1,5 +1,11 @@
 package integerProgramming;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 public class VectorBinomial extends Vector {
@@ -850,6 +856,21 @@ public class VectorBinomial extends Vector {
 		System.out.println("Critical pairs considered: "+critPairsConsidered);
 		System.out.println("zero Reductions: "+zeroRed);
 		System.out.println("GBSize: "+grobBasis.size());
+		try{
+			
+			FileWriter fw = new FileWriter(".\\data\\transp_samples\\LOG.txt",true);
+			BufferedWriter bw = new BufferedWriter(fw);
+	    	
+	    	//Closing BufferedWriter Stream
+			bw.write("*************\n");
+			bw.write("Critical pairs considered: "+critPairsConsidered+"\n");
+			bw.write("zero Reductions: "+zeroRed+"\n");
+			bw.write("GBSize: "+grobBasis.size()+"\n");
+			bw.close();
+				
+		} catch (IOException e) {
+   			// do something
+		}
 		
 		return grobBasis;
 	}
