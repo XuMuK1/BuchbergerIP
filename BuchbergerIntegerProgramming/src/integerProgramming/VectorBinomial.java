@@ -21,7 +21,11 @@ public class VectorBinomial extends Vector {
 		vec=vecc.vec;	
 	}
 	
-	
+	private VectorBinomial copyVectorBinomial() {
+		// TODO Auto-generated method stub
+		VectorBinomial vB = new VectorBinomial(new ArrayList<>(this.vec),this.firstValuableVariable);
+		return vB;
+	}
 
 	/******<Arithmetics>**************/
 	public static ArrayList<Integer> Add(VectorBinomial v1, VectorBinomial v2, int mul) throws Exception{
@@ -736,18 +740,21 @@ public class VectorBinomial extends Vector {
 				
 				if(spair.vec.get(i)!=0){
 					num++;
+					
 				}
+				if(num<=iter){
+					return true; //DROP IT!
+				}
+				//System.out.println(num);
+				
 			}
-			//System.out.println(num);
-			if(num<=iter){
-				return true; //DROP IT!
-			}
+			
 		}
 		return false; // ok.....
 	}
 	
 	
-	public static ArrayList<VectorBinomial> BuchbergerAlgorithm(ArrayList<VectorBinomial> basis, Vector grading, int V) throws Exception{
+	public static ArrayList<VectorBinomial> BuchbergerAlgorithm(ArrayList<String> outp, ArrayList<VectorBinomial> basis, Vector grading, int V) throws Exception{
 		ArrayList<VectorBinomial> grobBasis = new ArrayList<VectorBinomial>(basis);
 		//with iteration criterion
 		int j0=0;
@@ -797,6 +804,10 @@ public class VectorBinomial extends Vector {
 			System.out.println("GBSIze:"+grobBasis.size());
 			
 		}
+		outp.add(""+grobBasis.size());
+		outp.add(""+critPairsConsidered);
+		outp.add(""+zeroRed);
+		
 		System.out.println("SOLVED!");
 		System.out.println("Critical pairs considered: "+critPairsConsidered);
 		System.out.println("zero Reductions: "+zeroRed);
@@ -805,7 +816,7 @@ public class VectorBinomial extends Vector {
 		return grobBasis;
 	}
 	
-	public static ArrayList<VectorBinomial> BuchbergerAlgorithm(ArrayList<VectorBinomial> basis, Vector grading) throws Exception{
+	public static ArrayList<VectorBinomial> BuchbergerAlgorithm(ArrayList<String> outp,ArrayList<VectorBinomial> basis, Vector grading) throws Exception{
 		ArrayList<VectorBinomial> grobBasis = new ArrayList<VectorBinomial>(basis);
 		
 		int j0=0;
@@ -852,25 +863,15 @@ public class VectorBinomial extends Vector {
 			System.out.println("GBSIze:"+grobBasis.size());
 			
 		}
+		outp.add(""+grobBasis.size());
+		outp.add(""+critPairsConsidered);
+		outp.add(""+zeroRed);
+		
 		System.out.println("SOLVED!");
 		System.out.println("Critical pairs considered: "+critPairsConsidered);
 		System.out.println("zero Reductions: "+zeroRed);
 		System.out.println("GBSize: "+grobBasis.size());
-		try{
-			
-			FileWriter fw = new FileWriter(".\\data\\transp_samples\\LOG.txt",true);
-			BufferedWriter bw = new BufferedWriter(fw);
-	    	
-	    	//Closing BufferedWriter Stream
-			bw.write("*************\n");
-			bw.write("Critical pairs considered: "+critPairsConsidered+"\n");
-			bw.write("zero Reductions: "+zeroRed+"\n");
-			bw.write("GBSize: "+grobBasis.size()+"\n");
-			bw.close();
-				
-		} catch (IOException e) {
-   			// do something
-		}
+		
 		
 		return grobBasis;
 	}
@@ -999,5 +1000,188 @@ public class VectorBinomial extends Vector {
 		return;
 		
 	}
+	
+	private static int IncrementAsVCovSeq(ArrayList<Integer> seq){
+		//ternary system 0 1 -1
+		for(int i=seq.size()-1;i>=0;i--){	
+			if(seq.get(i)==1){
+				seq.set(i, -1);
+				return 0;//ok
+			}else{
+				if(i>0){
+					seq.set(i, 1);
+				}
+			}
+			
+		}
+		return -1; //not incrementable
+	}
+	
+	private static int UpdateKeys(ArrayList<Integer> keys) {
+		for(int i=0;i<keys.size();i++){
+			if(keys.get(i)>i){
+				keys.set(i,keys.get(i)-1);
+				return 0;
+			}else{
+				if(i<keys.size()-1){
+					if(keys.get(i+1)-1>=i+1){
+						keys.set(i,keys.get(i+1)-2);
+						keys.set(i+1,keys.get(i+1)-1);
+						return 0;
+					}
+				}
+			}
+		}
+
+		return -1;// oh no
+	}
+	
+	public static ArrayList<VectorBinomial> FindVCoverGB(ArrayList<ArrayList<Integer>> edges, Vector grading) throws Exception{
+		VectorBinomial g = new VectorBinomial(new ArrayList<Integer>(), 0);
+		ArrayList<VectorBinomial> basis = new ArrayList<VectorBinomial>();
+		
+		//init
+		Vector extgrading = Vector.copyVector(grading);
+		for(int i=0; i< grading.Size(); i++){
+			g.vec.add(0);
+			extgrading.set(i, grading.get(i)+1);
+		}
+		int k=1; //use k vertices for operations
+		ArrayList<Integer> keys = new ArrayList<Integer>();//included vertices
+		ArrayList<Integer> seq = new ArrayList<Integer>();//assigned numbers
+		
+		
+		for(int i=0; i<edges.size();i++){
+			extgrading.vec.add(0);
+		}
+		/*for(int i=0; i<grading.Size();i++){
+			extgrading.vec.add(1);
+		}*/
+		
+		while(k<=grading.Size()){
+			System.out.println("Considering k="+k);
+			int i=0;
+			
+			seq.add(1);
+			keys.add(grading.Size()-1);
+			for(int j=keys.size()-2;j>=0;j--){
+				keys.set(j,keys.get(j+1)-1);
+				seq.set(j, 1);
+			}
+			
+			
+			
+			int incStatus = 0;
+			
+			while(incStatus==0){
+				
+				
+				//System.out.println("INC status: "+incStatus);
+				//System.out.println();
+				while(true){
+					//output seq
+					
+					for(int j=0;j<keys.size();j++){
+						g.set(keys.get(j), seq.get(j));
+					}
+					//System.out.println("KEYS:" + keys);
+					//System.out.println("seq:" + seq);
+					//System.out.print("g:" + g);
+					if(g.CompareBlockGLex(0, grading)>0){
+						/*System.out.println("+");*/
+						VectorBinomial g1 = AddSlacks(g,basis,grading.Size(),edges,extgrading,k-1);
+						if(g1!=null){
+							basis.add(g1);
+							System.out.println(k+"BASIS SIZE:"+basis.size());
+						}
+					}/*else{
+						System.out.println("-");
+					}*/
+					for(int j=0;j<keys.size();j++){
+						g.set(keys.get(j), 0);
+					}
+					int upd=UpdateKeys(keys);
+					//System.out.println("UPD status: "+upd);
+					
+					if(upd!=0){
+						break;
+					}
+				}
+				
+				incStatus = IncrementAsVCovSeq(seq);
+				if(incStatus==0){
+					keys.set(keys.size()-1, grading.Size()-1);
+					for(int j=keys.size()-2;j>=0;j--){
+						keys.set(j,keys.get(j+1)-1);
+					}
+				}
+				
+			}
+			k++;
+		}
+		
+		return basis;
+	}
+
+	private static VectorBinomial AddSlacks(VectorBinomial g,ArrayList<VectorBinomial> basis, int size,
+			ArrayList<ArrayList<Integer>> edges, Vector grading, int iter) throws Exception {
+		
+		VectorBinomial g1 = g.copyVectorBinomial();
+		
+		for(int i=0;i<edges.size();i++){
+			int res=0;
+			if(g.get(edges.get(i).get(0))!=0){
+				res+=g.get(edges.get(i).get(0));
+			}
+			if(g.get(edges.get(i).get(1))!=0){
+				res+=g.get(edges.get(i).get(1));
+			}
+			if(res==1){
+				
+			}
+			g1.vec.add(res);
+		}
+		/*for(int i=0;i<size;i++){
+			g1.vec.add(-g1.get(i));
+		}*/
+		
+		/*VectorBinomial g2=g1.Plus();
+		for(int i=0;i<basis.size();i++){
+			int buf=g2.CompareTotally(basis.get(i).Plus());
+			if(buf*(1-buf)==0){
+				return null;
+			}
+		}*/
+		g1.ReduceByList(basis, grading,size,iter);
+		if(g1.CompareTotally(0)==0){
+			return null;
+		}
+		
+		return g1;
+	}
+
+	public static ArrayList<VectorBinomial> MinimizeBinaryBasis(ArrayList<VectorBinomial> basis) throws Exception {
+		// TODO Auto-generated method stub
+		ArrayList<VectorBinomial> newBasis = new ArrayList<VectorBinomial>();
+		for (int i=0;i<basis.size();i++){
+			int j=0;
+			for (j=0;j<basis.size();j++){
+				if(i!=j){
+					
+					if(basis.get(j).Plus().CompareTotally(basis.get(i).Plus())<0){
+						break;
+					}
+				}
+			}
+			if(j==basis.size()){
+				newBasis.add(basis.get(i));
+			}
+		}
+		
+		return newBasis;
+		
+	}
+	
+
 	
 }
