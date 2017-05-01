@@ -1,0 +1,3 @@
+./data/knapsack_samples/samples_25/sample_25_0.txt
+./data/knapsack_samples/samples_25/sample_25_1.txt
+./data/knapsack_samples/samples_25/sample_25_2.txt

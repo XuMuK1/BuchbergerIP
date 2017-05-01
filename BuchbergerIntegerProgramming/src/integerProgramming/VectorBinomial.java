@@ -1017,6 +1017,8 @@ public class VectorBinomial extends Vector {
 		return -1; //not incrementable
 	}
 	
+	
+	
 	private static int UpdateKeys(ArrayList<Integer> keys) {
 		for(int i=0;i<keys.size();i++){
 			if(keys.get(i)>i){
@@ -1025,6 +1027,25 @@ public class VectorBinomial extends Vector {
 			}else{
 				if(i<keys.size()-1){
 					if(keys.get(i+1)-1>=i+1){
+						keys.set(i,keys.get(i+1)-2);
+						keys.set(i+1,keys.get(i+1)-1);
+						return 0;
+					}
+				}
+			}
+		}
+
+		return -1;// oh no
+	}
+	
+	private static int UpdateKeysKnapsack(ArrayList<Integer> keys) {
+		for(int i=0;i<keys.size();i++){
+			if(keys.get(i)>i+1){
+				keys.set(i,keys.get(i)-1);
+				return 0;
+			}else{
+				if(i<keys.size()-1){
+					if(keys.get(i+1)-1>i+1){
 						keys.set(i,keys.get(i+1)-2);
 						keys.set(i+1,keys.get(i+1)-1);
 						return 0;
@@ -1123,6 +1144,89 @@ public class VectorBinomial extends Vector {
 		return basis;
 	}
 
+	public static ArrayList<VectorBinomial> FindKnapsackGB(ArrayList<Integer> weights,Vector grading) throws Exception{
+		VectorBinomial g = new VectorBinomial(new ArrayList<Integer>(), 0);
+		ArrayList<VectorBinomial> basis = new ArrayList<VectorBinomial>();
+		
+		//init
+		//Vector extgrading = Vector.copyVector(grading);
+		for(int i=0; i< grading.Size(); i++){
+			g.vec.add(0);
+			//extgrading.set(i, grading.get(i)+1);
+		}
+		int k=1; //use k items for operations
+		ArrayList<Integer> keys = new ArrayList<Integer>();//included vertices
+		ArrayList<Integer> seq = new ArrayList<Integer>();//assigned numbers
+		
+		/*for(int i=0; i<grading.Size();i++){
+			extgrading.vec.add(1);
+		}*/
+		
+		while(k<=(grading.Size()-1)/2){
+			System.out.println("Considering k="+k);
+			int i=0;
+			
+			seq.add(1);
+			keys.add((grading.Size()-1)/2);
+			for(int j=keys.size()-2;j>=1;j--){
+				keys.set(j,keys.get(j+1)-1);
+				seq.set(j, 1);
+			}
+			
+			
+			
+			int incStatus = 0;
+			
+			while(incStatus==0){
+				
+				
+				//System.out.println("INC status: "+incStatus);
+				//System.out.println();
+				while(true){
+					//output seq
+					
+					for(int j=0;j<keys.size();j++){
+						g.set(keys.get(j), seq.get(j));
+					}
+					//System.out.println("KEYS:" + keys);
+					//System.out.println("seq:" + seq);
+					//System.out.print("g:" + g);
+					if(g.CompareBlockGLex(0, grading)>0){
+						/*System.out.println("+");*/
+						VectorBinomial g1 = AddSlacksKnapsack(g,basis,(grading.Size()-1)/2,weights,grading);
+						if(g1!=null){
+							basis.add(g1);
+							System.out.println(k+"BASIS SIZE:"+basis.size());
+						}
+					}/*else{
+						System.out.println("-");
+					}*/
+					for(int j=0;j<keys.size();j++){
+						g.set(keys.get(j), 0);
+					}
+					int upd=UpdateKeysKnapsack(keys);
+					//System.out.println("UPD status: "+upd);
+					
+					if(upd!=0){
+						break;
+					}
+				}
+				
+				incStatus = IncrementAsVCovSeq(seq);
+				if(incStatus==0){
+					keys.set(keys.size()-1, grading.Size()-1);
+					for(int j=keys.size()-2;j>=0;j--){
+						keys.set(j,keys.get(j+1)-1);
+					}
+				}
+				
+			}
+			k++;
+		}
+		
+		return basis;
+	}
+	
 	private static VectorBinomial AddSlacks(VectorBinomial g,ArrayList<VectorBinomial> basis, int size,
 			ArrayList<ArrayList<Integer>> edges, Vector grading, int iter) throws Exception {
 		
@@ -1153,6 +1257,38 @@ public class VectorBinomial extends Vector {
 			}
 		}*/
 		g1.ReduceByList(basis, grading,size,iter);
+		if(g1.CompareTotally(0)==0){
+			return null;
+		}
+		
+		return g1;
+	}
+	
+	private static VectorBinomial AddSlacksKnapsack(VectorBinomial g,ArrayList<VectorBinomial> basis, int items,
+			ArrayList<Integer> weights, Vector grading) throws Exception {
+		
+		VectorBinomial g1 = g.copyVectorBinomial();
+		int s0=0;
+		
+		for(int i=1;i<=items;i++){
+			if(g.get(i)!=0){
+				s0+=g.get(i)*weights.get(i);
+			}
+			g.vec.add(-g.get(i));
+		}
+		g1.set(0,s0);
+		/*for(int i=0;i<size;i++){
+			g1.vec.add(-g1.get(i));
+		}*/
+		
+		/*VectorBinomial g2=g1.Plus();
+		for(int i=0;i<basis.size();i++){
+			int buf=g2.CompareTotally(basis.get(i).Plus());
+			if(buf*(1-buf)==0){
+				return null;
+			}
+		}*/
+		g1.ReduceByList(basis, grading);
 		if(g1.CompareTotally(0)==0){
 			return null;
 		}
