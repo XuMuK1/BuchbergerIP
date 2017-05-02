@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import gurobi.*;
+//import gurobi.*;
 
 public class TestingInterface {
 	/**********TESTS**********/
@@ -643,12 +643,12 @@ public class TestingInterface {
         	long startTime = System.currentTimeMillis();
         	
         	
-			ArrayList<VectorBinomial> gB = VectorBinomial.BuchbergerAlgorithm(outp,gs, grading, N);
+			ArrayList<VectorBinomial> gB = VectorBinomial.BuchbergerAlgorithm(outp,gs, grading,N);
 			out+=""+gB.size();
-			System.out.println("gB");
+			/*System.out.println("gB");
 			for(int i=0;i<gB.size();i++){
 				System.out.println(gB.get(i));
-			}
+			}*/
 
 			gB=VectorBinomial.MinimizeBasis(gB);
 			out+=" & "+gB.size();
@@ -671,7 +671,37 @@ public class TestingInterface {
         	long totalTime = endTime - startTime;
         	System.out.println("Execution Time:"+(double)(totalTime)/1000);//seconds
 			out+=" & "+(double)(totalTime)/1000;
-        	return feasSolution.vec;
+        	
+			
+			System.out.println("TRYING incremental...");
+			/*for(VectorBinomial g: gs){
+				System.out.println(g);
+			}*/
+			startTime = System.currentTimeMillis();
+			ArrayList<VectorBinomial> gB1 =VectorBinomial.BuchbergerIncrementalAlgorithm(outp,gs, grading);
+			gB1=VectorBinomial.MinimizeBasis(gB1);
+			System.out.println("Minimized GB: "+gB1.size());
+			/*for(VectorBinomial g: gB1){		
+				System.out.println(g);
+			}*/
+			Vector feasSolution1 = new Vector(new ArrayList<Integer>());
+			
+			//i.e. take ALL
+			for(int i=0; i< N+E;i++){
+				feasSolution1.vec.add(1);
+			}
+			
+			
+			System.out.println("FeasibleSolution: "+feasSolution1);
+			feasSolution1.FindNormalForm(gB1);
+			
+			System.out.println("OptimalSolution: "+feasSolution1);
+			System.out.println("OptimalSolution: "+feasSolution);
+			endTime   = System.currentTimeMillis();
+			totalTime = endTime - startTime;
+        	System.out.println("Execution Time:"+(double)(totalTime)/1000);//seconds
+        	
+			return feasSolution.vec;
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -931,7 +961,7 @@ private static void TestVCoverBoundedGB(String fileName) throws IOException {
 	}
 }
 
-	public static void SolveVCovWithGurobi(String fileName) throws IOException{
+	/*public static void SolveVCovWithGurobi(String fileName) throws IOException{
 		if(fileName == null)
             throw new FileNotFoundException("No such file");
         
@@ -1038,7 +1068,7 @@ private static void TestVCoverBoundedGB(String fileName) throws IOException {
 		                         e.getMessage());
 		    }
 	}
-	
+	*/
 	private static String out="";
 	
 	/**********TRANSPORTATION*******************/
@@ -1183,6 +1213,8 @@ private static void TestVCoverBoundedGB(String fileName) throws IOException {
 		
 		
 	}
+	
+	/*
 	private static void SolveTransportationWithGurobi(String fileName) throws IOException {
 		
 		if(fileName == null)
@@ -1311,7 +1343,7 @@ private static void TestVCoverBoundedGB(String fileName) throws IOException {
 	    
 		
 		
-	}
+	}*/
 	
 	public static void SampleSeveralTransportation(int m,int n,int samples){
 		File dir = new File(".\\data\\transp_samples\\samples_"+m+"x"+n+"\\");
@@ -1706,6 +1738,14 @@ private static ArrayList<Integer> SolveTransportation(ArrayList<String> outp, St
 	
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
+		
+		/**************TESTING FAUGERE*******************/
+		//Solve vcover
+		ArrayList<String> outp = new ArrayList<String>();
+		SolveVertexCover(outp, "./data/vcov_10_14");
+		
+		
+		
 		/*************KNAPSACKTESTS*****************/
 		
 		//FileWriter fw = new FileWriter(".\\data\\knapsack_samples\\LOG.csv",false);
@@ -1713,7 +1753,7 @@ private static ArrayList<Integer> SolveTransportation(ArrayList<String> outp, St
 		//bw.write("Problem,FullTime,GBSize,minGBSize,critPairs,zeroRed,maxDeg,maxCoord\n");
 		//bw.close();
 		
-		int maxWeight=5;
+		/*int maxWeight=5;
 		int Nsamples=3;
 		
 		for(int N=20;N<=40;N++){
@@ -1741,14 +1781,14 @@ private static ArrayList<Integer> SolveTransportation(ArrayList<String> outp, St
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-	        	/*outp format
-				 * outp.add(""+grobBasis.size());
-					outp.add(""+critPairsConsidered);
-					outp.add(""+zeroRed);
-					outp.add(""+minGrobBasis.size());
-					outp.add(time)
-					outp.add(maxdeg)	
-				 * */
+	        	//outp format
+				// * outp.add(""+grobBasis.size());
+				//	outp.add(""+critPairsConsidered);
+				//	outp.add(""+zeroRed);
+				//	outp.add(""+minGrobBasis.size());
+				//	outp.add(time)
+				//	outp.add(maxdeg)	
+				 
 	        	FileWriter fw = new FileWriter(".\\data\\knapsack_samples\\LOG.csv",true);
 	        	BufferedWriter bw = new BufferedWriter(fw);
 	    		//bw.write("Problem,FullTime,GBSize,minGBSize,critPairs,zeroRed\n");
@@ -1757,7 +1797,7 @@ private static ArrayList<Integer> SolveTransportation(ArrayList<String> outp, St
 	    		bw.close();
 	        	
 	        }
-		}
+		}*/
 		
 
 		
