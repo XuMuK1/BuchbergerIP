@@ -624,7 +624,7 @@ public class TestingInterface {
         	
         }
 		
-		//ArrayList<ArrayList<Integer>> edges = new ArrayList<ArrayList<Integer>>();
+		ArrayList<ArrayList<Integer>> edges = new ArrayList<ArrayList<Integer>>();
 		
         for(int i=N+1; i <=N+E; i++){
         	String line = lines.get(i);
@@ -673,17 +673,13 @@ public class TestingInterface {
 			out+=" & "+(double)(totalTime)/1000;
         	
 			
-			System.out.println("TRYING incremental...");
-			/*for(VectorBinomial g: gs){
-				System.out.println(g);
-			}*/
+			/*System.out.println("TRYING incremental...");
+			
 			startTime = System.currentTimeMillis();
 			ArrayList<VectorBinomial> gB1 =VectorBinomial.BuchbergerIncrementalAlgorithm(outp,gs, grading);
 			gB1=VectorBinomial.MinimizeBasis(gB1);
 			System.out.println("Minimized GB: "+gB1.size());
-			/*for(VectorBinomial g: gB1){		
-				System.out.println(g);
-			}*/
+			
 			Vector feasSolution1 = new Vector(new ArrayList<Integer>());
 			
 			//i.e. take ALL
@@ -699,7 +695,7 @@ public class TestingInterface {
 			System.out.println("OptimalSolution: "+feasSolution);
 			endTime   = System.currentTimeMillis();
 			totalTime = endTime - startTime;
-        	System.out.println("Execution Time:"+(double)(totalTime)/1000);//seconds
+        	System.out.println("Execution Time:"+(double)(totalTime)/1000);//seconds*/
         	
 			return feasSolution.vec;
 			
