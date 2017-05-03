@@ -630,6 +630,11 @@ public class TestingInterface {
         	String line = lines.get(i);
         	String[] parts = line.split("\\s+");
         	
+        	ArrayList<Integer> edge = new ArrayList<Integer>();
+        	edge.add(Integer.parseInt(parts[0]));
+        	edge.add(Integer.parseInt(parts[1]));
+        	edges.add(edge);
+        	
         	gs.get(Integer.parseInt(parts[0])).set(i-N-1+N,1);
         	gs.get(Integer.parseInt(parts[1])).set(i-N-1+N,1);
         	grading.vec.add(0);//for slacks
@@ -641,9 +646,40 @@ public class TestingInterface {
 		System.out.println("Trying to solve the problem: V="+N+" E="+E);
         try {
         	long startTime = System.currentTimeMillis();
+        	/*
+        	for(ArrayList<Integer> edge: edges){
+        		
+        		if(grading.get(edge.get(0))>grading.get(edge.get(1))){
+        			VectorBinomial gg = gs.get(edge.get(0)).copyVectorBinomial();
+        			gg.Add(gs.get(edge.get(1)),-1);
+        			gs.add(gg);
+        		}else{
+        			if(grading.get(edge.get(0))<grading.get(edge.get(1))){
+        				VectorBinomial gg = gs.get(edge.get(1)).copyVectorBinomial();
+            			gg.Add(gs.get(edge.get(0)),-1);
+            			gs.add(gg);
+        			}else{
+        				if(edge.get(0)<edge.get(1)){
+        					VectorBinomial gg = gs.get(edge.get(0)).copyVectorBinomial();
+                			gg.Add(gs.get(edge.get(1)),-1);
+                			gs.add(gg);
+        				}else{
+        					VectorBinomial gg = gs.get(edge.get(1)).copyVectorBinomial();
+                			gg.Add(gs.get(edge.get(0)),-1);
+                			gs.add(gg);
+        				}
+        			}
+        		}
+        		
+        		
+        	}
         	
-        	
-			ArrayList<VectorBinomial> gB = VectorBinomial.BuchbergerAlgorithm(outp,gs, grading,N);
+        	System.out.println("gs");
+			for(int i=0;i<gs.size();i++){
+				System.out.println(gs.get(i));
+			}
+			*/
+			ArrayList<VectorBinomial> gB = VectorBinomial.BuchbergerAlgorithm1(outp,gs, grading,N);
 			out+=""+gB.size();
 			/*System.out.println("gB");
 			for(int i=0;i<gB.size();i++){
@@ -672,30 +708,6 @@ public class TestingInterface {
         	System.out.println("Execution Time:"+(double)(totalTime)/1000);//seconds
 			out+=" & "+(double)(totalTime)/1000;
         	
-			
-			/*System.out.println("TRYING incremental...");
-			
-			startTime = System.currentTimeMillis();
-			ArrayList<VectorBinomial> gB1 =VectorBinomial.BuchbergerIncrementalAlgorithm(outp,gs, grading);
-			gB1=VectorBinomial.MinimizeBasis(gB1);
-			System.out.println("Minimized GB: "+gB1.size());
-			
-			Vector feasSolution1 = new Vector(new ArrayList<Integer>());
-			
-			//i.e. take ALL
-			for(int i=0; i< N+E;i++){
-				feasSolution1.vec.add(1);
-			}
-			
-			
-			System.out.println("FeasibleSolution: "+feasSolution1);
-			feasSolution1.FindNormalForm(gB1);
-			
-			System.out.println("OptimalSolution: "+feasSolution1);
-			System.out.println("OptimalSolution: "+feasSolution);
-			endTime   = System.currentTimeMillis();
-			totalTime = endTime - startTime;
-        	System.out.println("Execution Time:"+(double)(totalTime)/1000);//seconds*/
         	
 			return feasSolution.vec;
 			

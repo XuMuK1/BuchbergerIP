@@ -21,7 +21,7 @@ public class VectorBinomial extends Vector {
 		vec=vecc.vec;	
 	}
 	
-	private VectorBinomial copyVectorBinomial() {
+	public VectorBinomial copyVectorBinomial() {
 		// TODO Auto-generated method stub
 		VectorBinomial vB = new VectorBinomial(new ArrayList<>(this.vec),this.firstValuableVariable);
 		return vB;
@@ -780,6 +780,29 @@ public class VectorBinomial extends Vector {
 	}
 	
 	
+	private static boolean IterationCriterion(VectorBinomial g1, VectorBinomial g2,int V, int iter) {
+		// TODO Auto-generated method stub
+		// one more variant
+		int num=0;
+		//System.out.println(spair.vec);
+		for(int i=0;i<V;i++){
+			
+			if(g1.get(i)!=g2.get(i)){
+				num++;
+			}
+			if(num>iter){
+				return false; //ok...
+			}
+			//System.out.println(num);
+			
+		}
+		if(num<=iter){
+			return true;
+		}
+		
+		return false;
+	}
+	
 	public static ArrayList<VectorBinomial> BuchbergerAlgorithm(ArrayList<String> outp, ArrayList<VectorBinomial> basis, Vector grading, int V) throws Exception{
 		ArrayList<VectorBinomial> grobBasis = new ArrayList<VectorBinomial>(basis);
 		//with iteration criterion
@@ -847,15 +870,59 @@ public class VectorBinomial extends Vector {
 		return grobBasis;
 	}
 	
-	public static ArrayList<VectorBinomial> BuchbergerAlgorithm(ArrayList<String> outp, ArrayList<VectorBinomial> basis, Vector grading, int V, int startj0) throws Exception{
+	
+	private static boolean inTermsDivisible(int k, int i, int j, ArrayList<VectorBinomial> grobBasis) {
+		// TODO Auto-generated method stub
+		for(int w=0;w<grobBasis.get(k).Size();w++){
+			if(grobBasis.get(k).get(w)>0){
+				int lcm=0;
+				if(grobBasis.get(i).get(w)>0){
+					if(grobBasis.get(j).get(w)>0){
+						if(grobBasis.get(i).get(w)>grobBasis.get(j).get(w)){
+							lcm=grobBasis.get(i).get(w);
+						}else{
+							lcm=grobBasis.get(j).get(w);
+						}
+					}else{
+						lcm=grobBasis.get(i).get(w);
+					}
+				}else{
+					if(grobBasis.get(j).get(w)>0){
+						lcm=grobBasis.get(j).get(w);
+					}else{
+						lcm=0;
+					}
+				}
+				if(grobBasis.get(k).get(w)>lcm){
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+	
+	private static boolean ChainCriterion(int i, int j, ArrayList<VectorBinomial> grobBasis) {
+		// TODO Auto-generated method stub
+		for(int k=0;k<i;k++){
+			if(inTermsDivisible(k,i,j,grobBasis)){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	
+
+	public static ArrayList<VectorBinomial> BuchbergerAlgorithm1(ArrayList<String> outp, ArrayList<VectorBinomial> basis, Vector grading, int V) throws Exception{
 		ArrayList<VectorBinomial> grobBasis = new ArrayList<VectorBinomial>(basis);
 		//with iteration criterion
-		int j0=startj0;
+		//for vertex cover specially: no need for transform+startj0 from first pair
+		int j0=0;//startj0;
 		boolean added = true;
-		
-		for(int i=0; i< basis.size(); i++){
+		System.out.println(grading);
+		/*for(int i=0; i< basis.size(); i++){
 			basis.get(i).TransformToPlus(grading);
-		}
+		}*/
 		
 		long critPairsConsidered =0;
 		long zeroRed =0;
@@ -871,23 +938,24 @@ public class VectorBinomial extends Vector {
 					//System.out.println("i="+i+"  j="+j);
 					
 					if(!BuchbCriterion(grobBasis.get(i), grobBasis.get(j))){
-						
-						VectorBinomial spair = new VectorBinomial(new ArrayList<Integer>(grobBasis.get(i).vec),grobBasis.get(i).firstValuableVariable);
-						spair.Add(grobBasis.get(j),-1);
-						spair.TransformToPlus(grading);
-						if(!IterationCriterion(spair,V,iter)){
-							//System.out.println("Spair:"+spair);
-							//System.out.println("SpairSign:"+ spair.CompareBlockGLex(0, grading));
-							//System.out.println("Basis"+grobBasis);
-							spair.ReduceByList(grobBasis, grading, V, iter);
-							if(spair.isZero != 1){
-								grobBasis.add(spair);
-								//System.out.println("Added: "+spair.toString());
-								added=true;
-							}else{
-								zeroRed++;
+						if(!ChainCriterion(i,j,grobBasis)){
+							if(!IterationCriterion(grobBasis.get(i), grobBasis.get(j),V,iter)){
+								VectorBinomial spair = new VectorBinomial(new ArrayList<Integer>(grobBasis.get(i).vec),grobBasis.get(i).firstValuableVariable);
+								spair.Add(grobBasis.get(j),-1);
+								spair.TransformToPlus(grading);
+								//System.out.println("Spair:"+spair);
+								//System.out.println("SpairSign:"+ spair.CompareBlockGLex(0, grading));
+								//System.out.println("Basis"+grobBasis);
+								spair.ReduceByList(grobBasis, grading, V, iter);
+								if(spair.isZero != 1){
+									grobBasis.add(spair);
+									//System.out.println("Added: "+spair.toString());
+									added=true;
+								}else{
+									zeroRed++;
+								}
+								critPairsConsidered++;
 							}
-							critPairsConsidered++;
 						}
 					}
 						
@@ -910,6 +978,11 @@ public class VectorBinomial extends Vector {
 		return grobBasis;
 	}
 	
+	
+	
+
+	
+
 	public static ArrayList<VectorBinomial> BuchbergerAlgorithm(ArrayList<String> outp,ArrayList<VectorBinomial> basis, Vector grading) throws Exception{
 		ArrayList<VectorBinomial> grobBasis = new ArrayList<VectorBinomial>(basis);
 		
