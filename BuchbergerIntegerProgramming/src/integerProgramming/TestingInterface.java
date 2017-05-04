@@ -1747,11 +1747,11 @@ private static ArrayList<Integer> SolveTransportation(ArrayList<String> outp, St
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
 		
-		/**************TESTING FAUGERE*******************/
+		/**************TESTING THINGS*******************/
 		//Solve vcover
 		ArrayList<String> outp = new ArrayList<String>();
-		SolveVertexCover(outp, "./data/vcov_10_14");
-		
+		//SolveVertexCover(outp, "./data/vcov_6_7");
+		FindGBTransportation(outp,"./data/transp_samples/samples_"+8+"x"+8+"/"+"transp_"+8+"x"+8+"_0.txt");
 		
 		
 		/*************KNAPSACKTESTS*****************/

@@ -827,27 +827,28 @@ public class VectorBinomial extends Vector {
 					//System.out.println("i="+i+"  j="+j);
 					
 					if(!BuchbCriterion(grobBasis.get(i), grobBasis.get(j))){
-						
-						VectorBinomial spair = new VectorBinomial(new ArrayList<Integer>(grobBasis.get(i).vec),grobBasis.get(i).firstValuableVariable);
-						spair.Add(grobBasis.get(j),-1);
-						spair.TransformToPlus(grading);
-						if(!IterationCriterion(spair,V,iter)){
-							
-								//String spairstr="Spair:"+spair;
-								//System.out.println("SpairSign:"+ spair.CompareBlockGLex(0, grading));
-								//String basisstr="Basis"+grobBasis;
-								spair.ReduceByList(grobBasis, grading, V, iter);
-								if(spair.isZero != 1){
-									grobBasis.add(spair);
-									//System.out.println("Added: "+spair.toString());
-									added=true;
-								}else{
-									/*System.out.println(spairstr+" REDUCED TO 0");
-									System.out.println(basisstr);*/
-									zeroRed++;
-								}
-								critPairsConsidered++;
-							
+						if(!ChainCriterion(i,j,grobBasis)){
+							VectorBinomial spair = new VectorBinomial(new ArrayList<Integer>(grobBasis.get(i).vec),grobBasis.get(i).firstValuableVariable);
+							spair.Add(grobBasis.get(j),-1);
+							spair.TransformToPlus(grading);
+							if(!IterationCriterion(spair,V,iter)){
+								
+									//String spairstr="Spair:"+spair;
+									//System.out.println("SpairSign:"+ spair.CompareBlockGLex(0, grading));
+									//String basisstr="Basis"+grobBasis;
+									spair.ReduceByList(grobBasis, grading, V, iter);
+									if(spair.isZero != 1){
+										grobBasis.add(spair);
+										//System.out.println("Added: "+spair.toString());
+										added=true;
+									}else{
+										/*System.out.println(spairstr+" REDUCED TO 0");
+										System.out.println(basisstr);*/
+										zeroRed++;
+									}
+									critPairsConsidered++;
+								
+							}
 						}
 					}
 						
@@ -943,6 +944,8 @@ public class VectorBinomial extends Vector {
 								VectorBinomial spair = new VectorBinomial(new ArrayList<Integer>(grobBasis.get(i).vec),grobBasis.get(i).firstValuableVariable);
 								spair.Add(grobBasis.get(j),-1);
 								spair.TransformToPlus(grading);
+								String spairstr=spair.toString();
+								
 								//System.out.println("Spair:"+spair);
 								//System.out.println("SpairSign:"+ spair.CompareBlockGLex(0, grading));
 								//System.out.println("Basis"+grobBasis);
@@ -953,6 +956,8 @@ public class VectorBinomial extends Vector {
 									added=true;
 								}else{
 									zeroRed++;
+									System.out.println("REDUCED TO ZERO!! "+spairstr);
+									System.out.println("BASIS:\n "+grobBasis);
 								}
 								critPairsConsidered++;
 							}
@@ -1006,21 +1011,23 @@ public class VectorBinomial extends Vector {
 					//System.out.println("i="+i+"  j="+j);
 					
 					if(!BuchbCriterion(grobBasis.get(i), grobBasis.get(j))){
-						VectorBinomial spair = new VectorBinomial(new ArrayList<Integer>(grobBasis.get(i).vec),grobBasis.get(i).firstValuableVariable);
-						spair.Add(grobBasis.get(j),-1);
-						spair.TransformToPlus(grading);
-						//System.out.println("Spair:"+spair);
-						//System.out.println("SpairSign:"+ spair.CompareBlockGLex(0, grading));
-						//System.out.println("Basis"+grobBasis);
-						spair.ReduceByList(grobBasis, grading);
-						if(spair.isZero != 1){
-							grobBasis.add(spair);
-							//System.out.println("Added: "+spair.toString());
-							added=true;
-						}else{
-							zeroRed++;
+						if(!ChainCriterion(i,j,grobBasis)){
+							VectorBinomial spair = new VectorBinomial(new ArrayList<Integer>(grobBasis.get(i).vec),grobBasis.get(i).firstValuableVariable);
+							spair.Add(grobBasis.get(j),-1);
+							spair.TransformToPlus(grading);
+							//System.out.println("Spair:"+spair);
+							//System.out.println("SpairSign:"+ spair.CompareBlockGLex(0, grading));
+							//System.out.println("Basis"+grobBasis);
+							spair.ReduceByList(grobBasis, grading);
+							if(spair.isZero != 1){
+								grobBasis.add(spair);
+								//System.out.println("Added: "+spair.toString());
+								added=true;
+							}else{
+								zeroRed++;
+							}
+							critPairsConsidered++;
 						}
-						critPairsConsidered++;
 					}
 						
 					
