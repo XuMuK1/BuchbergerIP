@@ -16,212 +16,7 @@ import java.util.List;
 public class TestingInterface {
 	/**********TESTS**********/
 	
-	private static void VectorsAndOrders(){
-		//tests vectors initialization and orders
-		//set up a binomial
-		ArrayList<Integer> bufAr = new ArrayList<Integer>();
-		bufAr.add(0);
-		bufAr.add(1);
-		bufAr.add(-2);
-		bufAr.add(2);
-		VectorBinomial vb1 = new VectorBinomial(bufAr ,0);
-		System.out.println("The first one "+vb1.toString());
-
-		//set up another binomial
-		bufAr= new ArrayList<Integer>(bufAr);
-		bufAr.set(0,0);
-		bufAr.set(1,0);
-		bufAr.set(2,-1);
-		bufAr.set(3,1);
-		VectorBinomial vb2 = new VectorBinomial(bufAr ,0);
-		System.out.println("The second one "+vb2.toString());
-		
-		//set up example grading
-		bufAr= new ArrayList<Integer>(bufAr);
-		bufAr.set(0,0);
-		bufAr.set(1,0);
-		bufAr.set(2,0);
-		bufAr.set(3,0);
-		Vector grading = new Vector(bufAr);
-		System.out.println("Grading "+grading.toString());
-		
-		//ComparisonTests
-		System.out.println("*****Comparisons(1 with 2)****");
-		try {
-			System.out.println("Total "+vb1.CompareTotally(vb2));
-			System.out.println("Lex "+vb1.CompareLex(vb2));
-			System.out.println("RevLex "+vb1.CompareRevLex(vb2));
-			System.out.println("GLex "+vb1.CompareGLex(vb2,grading));
-			System.out.println("GRevLex "+vb1.CompareGRevLex(vb2,grading));
-			
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		//TransformationTest
-		ArrayList<VectorBinomial> vecSet = new ArrayList<VectorBinomial>();
-		vecSet.add(vb1);
-		vecSet.add(vb2);
-		System.out.println("*****Transformation >0****");
-		try {
-			for(int i=0; i<vecSet.size(); i++){
-				vecSet.get(i).TransformToPlus(grading);
-			}
-			System.out.println(vecSet.toString());
-
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		//ReductionTest g1,g2 >Lex 0, answer 0,1,0,2
-		ArrayList<VectorBinomial> gs = new ArrayList<VectorBinomial>();
-		VectorBinomial g1= new VectorBinomial(new ArrayList<Integer>(),0);
-		g1.vec.add(1);
-		g1.vec.add(0);
-		g1.vec.add(-1);
-		g1.vec.add(0);
-		gs.add(g1);
-		
-		g1= new VectorBinomial(new ArrayList<Integer>(),0);
-		g1.vec.add(0);
-		g1.vec.add(2);
-		g1.vec.add(1);
-		g1.vec.add(0);
-		gs.add(g1);
-		
-		VectorBinomial f = new VectorBinomial(new ArrayList<Integer>(),0);
-		f.vec.add(5);
-		f.vec.add(-3);
-		f.vec.add(-6);
-		f.vec.add(2);
-		
-		System.out.println("*****Reduction****");
-		try {
-			System.out.println(f.toString());
-			System.out.println("by");
-			System.out.println(gs.toString());
-			
-			f.ReduceByList(gs, grading);
-			
-			System.out.println("Result: "+f.toString());
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-	}
 	
-	private static void GrobnerTest(ArrayList<String> outp){
-		System.out.println("***************GROBNER TEST*************");
-		//t,s0,x1,x2,s1,s2
-		//c=[0,3,2,0,0]
-		Vector grading= new Vector(new ArrayList<Integer>());
-		
-		grading.vec.add(2);
-		grading.vec.add(19);
-		grading.vec.add(45);
-		grading.vec.add(11);
-		grading.vec.add(1);
-		grading.vec.add(1);
-		grading.vec.add(1);
-		
-		ArrayList<VectorBinomial> gs = new ArrayList<VectorBinomial>();
-		VectorBinomial g1= new VectorBinomial(new ArrayList<Integer>(),1);
-		g1.vec.add(0);//t
-		g1.vec.add(-1);//x1
-		g1.vec.add(0);//x2
-		g1.vec.add(0);//x3
-		g1.vec.add(1);//s0
-		g1.vec.add(1);//s1
-		g1.vec.add(0);//s2
-		g1.vec.add(0);//s3
-		gs.add(g1);
-		
-		g1= new VectorBinomial(new ArrayList<Integer>(),1);
-		g1.vec.add(0);//t
-		g1.vec.add(0);//x1
-		g1.vec.add(-1);//x2
-		g1.vec.add(0);//x3
-		g1.vec.add(3);//s0
-		g1.vec.add(0);//s1
-		g1.vec.add(1);//s2
-		g1.vec.add(0);//s3
-		gs.add(g1);
-		/***/
-		
-		g1= new VectorBinomial(new ArrayList<Integer>(),1);
-		g1.vec.add(0);//t
-		g1.vec.add(0);//x1
-		g1.vec.add(0);//x2
-		g1.vec.add(-1);//x3
-		g1.vec.add(5);//s0
-		g1.vec.add(0);//s1
-		g1.vec.add(0);//s2
-		g1.vec.add(1);//s3
-		gs.add(g1);
-		/***/
-		
-		
-		g1= new VectorBinomial(new ArrayList<Integer>(),1);
-		g1.vec.add(1);
-		g1.vec.add(1);
-		g1.vec.add(1);
-		g1.vec.add(1);
-		g1.vec.add(1);
-		g1.vec.add(1);
-		g1.vec.add(1);
-		g1.vec.add(1);
-		gs.add(g1);
-		
-		System.out.println("Vectors:");
-		System.out.println(gs);
-		
-		try {
-			
-			long gbTime = System.nanoTime();
-			long totalTime=0;
-			ArrayList<VectorBinomial> grobBasis = null;//TIME MEASUREMENT staff
-			for(int i=0; i<100; i++){
-				grobBasis = VectorBinomial.BuchbergerAlgorithm(outp,gs, grading);
-				long snt=System.nanoTime();
-				totalTime+= snt-gbTime;
-				gbTime=snt;
-			}
-			
-			System.out.println("GrobnerBasis(only with valuable variables) timeForGB(aver over 100)="+totalTime/100+"nsec was: 1200-1600e+03");
-			
-			grobBasis = VectorBinomial.FilterBasis(grobBasis);
-			for (VectorBinomial v: grobBasis){
-				System.out.println(v.toString());
-			}
-			Vector feasSolution = new Vector(new ArrayList<Integer>());
-			feasSolution.vec.add(0);
-			feasSolution.vec.add(0);
-			feasSolution.vec.add(0);
-			feasSolution.vec.add(7);
-			feasSolution.vec.add(1);
-			feasSolution.vec.add(1);
-			feasSolution.vec.add(1);
-			
-			System.out.println("FeasibleSolution: "+feasSolution);
-			totalTime=0;
-			gbTime = System.nanoTime();
-			for (int i=0; i< 100; i++){
-				feasSolution.FindNormalForm(grobBasis);
-				long snt = System.nanoTime();
-				totalTime+= snt - gbTime;
-				gbTime = snt;
-			}
-			
-			System.out.println("was(20-37 e+03)exTime(aver over 100)="+totalTime/100+"nsec . OptimalSolution: "+feasSolution);
-			
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
 	
 	
 	/*******************KNAPSACK****************/
@@ -251,61 +46,57 @@ public class TestingInterface {
         int numberOfItems = Integer.parseInt(firstLine[0]);
         int capacity = Integer.parseInt(firstLine[1]);
 		
-        Vector grading = new Vector(new ArrayList<Integer>());
+        Vector grading = new Vector(new int[2*numberOfItems+1]);
         ArrayList<VectorBinomial> gs = new ArrayList<VectorBinomial>();
         
-        grading.vec.add(1);//for s0
-		for(int i=1; i <= numberOfItems; i++){
+        grading.set(0,1);//for s0
+		/*for(int i=1; i <= numberOfItems; i++){
         	grading.vec.add(0);
         	grading.vec.add(0
         			);
-        }
+        }*///FOR ARRAY LISTS
+        
 		ArrayList<Integer> weights = new ArrayList<Integer>();
         for(int i=0; i < numberOfItems; i++){
         	String line = lines.get(i+1);
         	String[] parts = line.split("\\s+");
-        	VectorBinomial g1= new VectorBinomial(new ArrayList<Integer>(),0);
+        	VectorBinomial g1= new VectorBinomial(new int[2*numberOfItems+1],0);
         	
         	//g1.vec.add(0);
-        	g1.vec.add(Integer.parseInt(parts[1]));
+        	g1.set(0,Integer.parseInt(parts[1]));
         	
-        	for (int j=1; j<i; j++){
+        	/*for (int j=1; j<i; j++){
         		g1.vec.add(0);
-        	}
-    		g1.vec.add(-1);
-    		for (int j=i+1; j<numberOfItems+i; j++){
+        	}*/ //ARRAYLISTS
+    		g1.set(i+1,-1);
+    		/*for (int j=i+1; j<numberOfItems+i; j++){
         		g1.vec.add(0);
-        	}
-    		g1.vec.add(1);
-    		for (int j=0; j<numberOfItems-i; j++){
+        	}*///ARRAYLISTS
+    		g1.set(i+1+numberOfItems,1);
+    		/*for (int j=0; j<numberOfItems-i; j++){
         		g1.vec.add(0);
-        	}
-    		gs.add(g1);
+        	}*///ARRAY LSITS
     		
-    		grading.vec.set(i,1+weights.get(i));
-    		grading.vec.set(i+numberOfItems,Integer.parseInt(parts[0])+1);
+    		gs.add(g1);
+    		weights.add(Integer.parseInt(parts[1]));
+    		grading.set(i,1+Integer.parseInt(parts[1]));
+    		grading.set(i+numberOfItems,Integer.parseInt(parts[0])+1);
         }
         System.out.println(grading);
-        VectorBinomial g1= new VectorBinomial(new ArrayList<Integer>(),1);//adding 1-tf
         
-        for (int i=0;i<= numberOfItems;i++){
-        	g1.vec.add(-1);
-        	g1.vec.add(-1);
-        }
-        gs.add(g1);
 		
         try {
         	long start = System.currentTimeMillis();
-			ArrayList<VectorBinomial> gB = VectorBinomial.FindKnapsackGB(weights, grading);
+			//ArrayList<VectorBinomial> gB = VectorBinomial.FindKnapsackGB(weights, grading);
+        	ArrayList<VectorBinomial> gB = VectorBinomial.BuchbergerAlgorithm(outp, gs, grading);
+			Vector feasSolution = new Vector(new int[2*numberOfItems+1]);
 			
-			Vector feasSolution = new Vector(new ArrayList<Integer>());
-			
-			feasSolution.vec.add(capacity);//i.e. take NOTHING
+			feasSolution.set(0,capacity);//i.e. take NOTHING
 			for(int i=0; i< numberOfItems;i++){
-				feasSolution.vec.add(0);
+				feasSolution.set(i+1,0);
 			}
 			for(int i=0; i< numberOfItems;i++){
-				feasSolution.vec.add(1);
+				feasSolution.set(i+1+numberOfItems,1);
 			}
 			
 			System.out.println("FeasibleSolution: "+feasSolution);
@@ -337,7 +128,7 @@ public class TestingInterface {
 	}
 	
 	
-	private static ArrayList<Integer> SolveKnapsack(ArrayList<String> outp,String fileName) throws Throwable {
+	private static int[] SolveKnapsack(ArrayList<String> outp,String fileName) throws Throwable {
 		// TODO Auto-generated method stub
 		
 		if(fileName == null)
@@ -363,37 +154,40 @@ public class TestingInterface {
         int numberOfItems = Integer.parseInt(firstLine[0]);
         int capacity = Integer.parseInt(firstLine[1]);
 		
-        Vector grading = new Vector(new ArrayList<Integer>());
+        Vector grading = new Vector(new int[2*numberOfItems+1]);
         ArrayList<VectorBinomial> gs = new ArrayList<VectorBinomial>();
         
-        grading.vec.add(1);//for s0
-		for(int i=1; i <= numberOfItems; i++){
+        grading.set(0,1);//for s0
+		/*for(int i=1; i <= numberOfItems; i++){
         	grading.vec.add(0);
         	grading.vec.add(0);
-        }
+        }*/ //ARRAYLISTS
 		
-        for(int i=1; i <= numberOfItems; i++){
-        	String line = lines.get(i);
+        ArrayList<Integer> weights = new ArrayList<Integer>();
+        for(int i=0; i < numberOfItems; i++){
+        	String line = lines.get(i+1);
         	String[] parts = line.split("\\s+");
-        	VectorBinomial g1= new VectorBinomial(new ArrayList<Integer>(),0);
-
-        	g1.vec.add(Integer.parseInt(parts[1]));
+        	VectorBinomial g1= new VectorBinomial(new int[2*numberOfItems+1],0);
         	
-        	for (int j=1; j<i; j++){
+        	//g1.vec.add(0);
+        	g1.set(0,Integer.parseInt(parts[1]));
+        	
+        	/*for (int j=1; j<i; j++){
         		g1.vec.add(0);
-        	}
-    		g1.vec.add(-1);
-    		for (int j=i+1; j<numberOfItems+i; j++){
+        	}*/ //ARRAYLISTS
+    		g1.set(i+1,-1);
+    		/*for (int j=i+1; j<numberOfItems+i; j++){
         		g1.vec.add(0);
-        	}
-    		g1.vec.add(1);
-    		for (int j=0; j<numberOfItems-i; j++){
+        	}*///ARRAYLISTS
+    		g1.set(i+1+numberOfItems,1);
+    		/*for (int j=0; j<numberOfItems-i; j++){
         		g1.vec.add(0);
-        	}
+        	}*///ARRAY LSITS
+    		
     		gs.add(g1);
     		
-    		grading.vec.set(i,1+g1.vec.get(0));
-    		grading.vec.set(i+numberOfItems,Integer.parseInt(parts[0])+1);
+    		grading.set(i,1+weights.get(i));
+    		grading.set(i+numberOfItems,Integer.parseInt(parts[0])+1);
         }
         System.out.println(grading);
         
@@ -403,16 +197,14 @@ public class TestingInterface {
 			ArrayList<VectorBinomial> gB = VectorBinomial.BuchbergerAlgorithm(outp,gs, grading);
 			gB=VectorBinomial.MinimizeBasis(gB);
 			outp.add(gB.size()+"");
-			Vector feasSolution = new Vector(new ArrayList<Integer>());
+			Vector feasSolution = new Vector(new int[2*numberOfItems+1]);
 			
-			feasSolution.vec.add(capacity);//i.e. take NOTHING
+			feasSolution.set(0,capacity);//i.e. take NOTHING
 			for(int i=0; i< numberOfItems;i++){
-				feasSolution.vec.add(0);
+				feasSolution.set(i+1,0);
+				feasSolution.set(i+1+numberOfItems,1);
 			}
-			for(int i=0; i< numberOfItems;i++){
-				feasSolution.vec.add(1);
-			}
-			
+
 			System.out.println("FeasibleSolution: "+feasSolution);
 			feasSolution.FindNormalForm(gB);
 			System.out.println("OptimalSolution: "+feasSolution);
@@ -584,7 +376,7 @@ public class TestingInterface {
 		
 	}*/
 	
-	private static ArrayList<Integer> SolveVertexCover(ArrayList<String> outp,String fileName) throws IOException {
+	private static int[] SolveVertexCover(ArrayList<String> outp,String fileName) throws IOException {
 		
 		if(fileName == null)
             throw new FileNotFoundException("No such file");
@@ -609,15 +401,15 @@ public class TestingInterface {
         int N = Integer.parseInt(firstLine[0]);
         int E = Integer.parseInt(firstLine[1]);
 		
-        Vector grading = new Vector(new ArrayList<Integer>());
+        Vector grading = new Vector(new int[N+E]);
         ArrayList<VectorBinomial> gs = new ArrayList<VectorBinomial>();
         
         
 		for(int i=1; i <= N; i++){
-        	grading.vec.add(Integer.parseInt(lines.get(i)));
-        	VectorBinomial g1= new VectorBinomial(new ArrayList<Integer>(),0);
+        	grading.set(i-1,Integer.parseInt(lines.get(i)));
+        	VectorBinomial g1= new VectorBinomial(new int[N+E],0);
         	for(int j=0; j<N+E; j++){
-        		g1.vec.add(0);
+        		g1.set(j,0);
         	}
         	g1.set(i-1,1);
         	gs.add(g1);
@@ -637,7 +429,7 @@ public class TestingInterface {
         	
         	gs.get(Integer.parseInt(parts[0])).set(i-N-1+N,1);
         	gs.get(Integer.parseInt(parts[1])).set(i-N-1+N,1);
-        	grading.vec.add(0);//for slacks
+        	grading.set(i-1,0);//for slacks
         }
         //for(int i=0;i<gs.size();i++){
 		//	System.out.println(gs.get(i));
@@ -681,22 +473,23 @@ public class TestingInterface {
 			*/
 			ArrayList<VectorBinomial> gB = VectorBinomial.BuchbergerAlgorithm1(outp,gs, grading,N);
 			out+=""+gB.size();
-			/*System.out.println("gB");
-			for(int i=0;i<gB.size();i++){
+			System.out.println("gB");
+			/*for(int i=0;i<gB.size();i++){
 				System.out.println(gB.get(i));
 			}*/
 
+			
 			gB=VectorBinomial.MinimizeBasis(gB);
 			out+=" & "+gB.size();
 			
 			System.out.println("Minimized GB: "+gB.size());
 			
 			
-			Vector feasSolution = new Vector(new ArrayList<Integer>());
+			Vector feasSolution = new Vector(new int[N+E]);
 			
 			//i.e. take ALL
 			for(int i=0; i< N+E;i++){
-				feasSolution.vec.add(1);
+				feasSolution.set(i,1);
 			}
 			
 			
@@ -720,118 +513,7 @@ public class TestingInterface {
 		
 	}
 	
-private static ArrayList<Integer> SolveBoundedVertexCover(ArrayList<String> outp,String fileName) throws IOException {
-		
-		if(fileName == null)
-            throw new FileNotFoundException("No such file");
-        
-        // read the lines out of the file
-        List<String> lines = new ArrayList<String>();
 
-        BufferedReader input =  new BufferedReader(new FileReader(fileName));
-        try {
-            String line = null;
-            while (( line = input.readLine()) != null){
-                lines.add(line);
-            }
-        }
-        finally {
-            input.close();
-        }
-        //System.out.println(lines.size());
-        
-        // parse the data in the file
-        String[] firstLine = lines.get(0).split("\\s+");
-        int N = Integer.parseInt(firstLine[0]);
-        int E = Integer.parseInt(firstLine[1]);
-		
-        Vector grading = new Vector(new ArrayList<Integer>());
-        ArrayList<VectorBinomial> gs = new ArrayList<VectorBinomial>();
-        
-        
-		for(int i=1; i <= N; i++){
-        	grading.vec.add(Integer.parseInt(lines.get(i))+1);//+1 for binary slacks
-        	VectorBinomial g1= new VectorBinomial(new ArrayList<Integer>(),0);
-        	for(int j=0; j<2*N+E; j++){
-        		g1.vec.add(0);
-        	}
-        	g1.set(i-1,1);
-        	g1.set(N+E+i-1,-1);
-        	gs.add(g1);
-        	
-        }
-		
-		for(int i=0;i<N;i++){
-			grading.vec.add(1);
-		}
-		//ArrayList<ArrayList<Integer>> edges = new ArrayList<ArrayList<Integer>>();
-		
-        for(int i=N+1; i <=N+E; i++){
-        	String line = lines.get(i);
-        	String[] parts = line.split("\\s+");
-        	
-        	gs.get(Integer.parseInt(parts[0])).set(i-N-1+N,1);
-        	gs.get(Integer.parseInt(parts[1])).set(i-N-1+N,1);
-        	grading.vec.add(0);//for slacks
-        }
-        //for(int i=0;i<gs.size();i++){
-		//	System.out.println(gs.get(i));
-		//}
-        //System.out.println(grading);
-		System.out.println("Trying to solve the problem: V="+N+" E="+E);
-        try {
-        	long startTime = System.currentTimeMillis();
-        	
-        	
-			ArrayList<VectorBinomial> gB = VectorBinomial.BuchbergerAlgorithm(outp, gs, grading);
-			out+=""+gB.size();
-			/*System.out.println("gB");
-			for(int i=0;i<gB.size();i++){
-				System.out.println(gB.get(i));
-			}
-*/
-			gB=VectorBinomial.MinimizeBasis(gB);
-			out+=" & "+gB.size();
-			
-			System.out.println("Minimized GB: "+gB.size());
-			
-			
-			Vector feasSolution = new Vector(new ArrayList<Integer>());
-			
-			//i.e. take ALL
-			for(int i=0; i< N+E;i++){
-				feasSolution.vec.add(1);
-			}
-			for(int i=0; i< N;i++){
-				feasSolution.vec.add(0);
-			}
-			
-			
-			System.out.println("FeasibleSolution: "+feasSolution);
-			feasSolution.FindNormalForm(gB);
-			System.out.println("OptimalSolution: "+feasSolution);
-			
-			long endTime   = System.currentTimeMillis();
-        	long totalTime = endTime - startTime;
-        	
-        	int cost=0;
-			for(int i=0;i<N;i++){
-				cost+=(grading.get(i)-1)*feasSolution.get(i);
-			}
-			System.out.println("COST:"+cost);
-			
-        	System.out.println("Execution Time:"+(double)(totalTime)/1000);//seconds
-			out+=" & "+(double)(totalTime)/1000;
-        	return feasSolution.vec;
-			
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        
-		return null;
-		
-	}
 
 	/*private static ArrayList<Integer> BuildFeasibleTTP(ArrayList<Integer> ds, ArrayList<Integer> ss, ArrayList<Integer> cs, int D, int S, int G){
 		//ds demands matrix
@@ -885,7 +567,7 @@ private static ArrayList<Integer> SolveBoundedVertexCover(ArrayList<String> outp
 
 
 
-private static void TestVCoverBoundedGB(String fileName) throws IOException {
+/*private static void TestVCoverBoundedGB(String fileName) throws IOException {
 	// TODO Auto-generated method stub
 	
 	if(fileName == null)
@@ -947,9 +629,7 @@ private static void TestVCoverBoundedGB(String fileName) throws IOException {
 		for(int i=0; i< N+E;i++){
 			feasSolution.vec.add(1);
 		}
-		/*for(int i=0; i< N;i++){
-			feasSolution.vec.add(0);
-		}*/
+		
 		
 		
 		System.out.println("FeasibleSolution: "+feasSolution);
@@ -960,15 +640,14 @@ private static void TestVCoverBoundedGB(String fileName) throws IOException {
 			cost+=grading.get(i)*feasSolution.get(i);
 		}
 		System.out.println("COST:"+cost);
-		/*for(VectorBinomial el: bgB){
-			System.out.println(el);
-		}*/
+		
 	} catch (Exception e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
 	}
 }
-
+*/
+	
 	/*public static void SolveVCovWithGurobi(String fileName) throws IOException{
 		if(fileName == null)
             throw new FileNotFoundException("No such file");
@@ -1081,11 +760,11 @@ private static void TestVCoverBoundedGB(String fileName) throws IOException {
 	
 	/**********TRANSPORTATION*******************/
 	private static Vector NWCorner(ArrayList<Integer> demands, ArrayList<Integer> supplies ){
-		Vector feasSolution = new Vector(new ArrayList<Integer>());
+		Vector feasSolution = new Vector(new int[demands.size()*supplies.size()]);
 		
 		//NW corner
 		for(int i=0; i< demands.size()*supplies.size();i++){
-			feasSolution.vec.add(0);
+			feasSolution.set(i,0);
 		}
 		
 		int j=0;
@@ -1515,10 +1194,10 @@ private static void TestVCoverBoundedGB(String fileName) throws IOException {
 	    int M = Integer.parseInt(firstLine[0]);
 	    int N = Integer.parseInt(firstLine[1]);
 		
-	    Vector grading = new Vector(new ArrayList<Integer>());
+	    Vector grading = new Vector(new int[M*N]);
 	       
 		for(int i=1; i <= M*N; i++){
-	    	grading.vec.add(Integer.parseInt(lines.get(i)));
+	    	grading.set(i-1,Integer.parseInt(lines.get(i)));
 	    }
 		
 		
@@ -1539,9 +1218,9 @@ private static void TestVCoverBoundedGB(String fileName) throws IOException {
 	        	for(int i=0;i<j;i++){
 	        		for(int l=1;l<=N-1;l++){
 	                	for(int k=0;k<l;k++){
-	                		VectorBinomial g1= new VectorBinomial(new ArrayList<Integer>(),0);
+	                		VectorBinomial g1= new VectorBinomial(new int[M*N],0);
 	                    	for(int x=0;x<M*N;x++){
-	                    		g1.vec.add(0);
+	                    		g1.set(x,0);
 	                    	}
 	                		g1.set(i*N+l, 1);
 	                		g1.set(j*N+k, 1);
@@ -1581,7 +1260,7 @@ private static void TestVCoverBoundedGB(String fileName) throws IOException {
 		
 	}
 	
-private static ArrayList<Integer> SolveTransportation(ArrayList<String> outp, String fileName) throws IOException {
+private static int[] SolveTransportation(ArrayList<String> outp, String fileName) throws IOException {
 		
 		if(fileName == null)
             throw new FileNotFoundException("No such file");
@@ -1606,11 +1285,11 @@ private static ArrayList<Integer> SolveTransportation(ArrayList<String> outp, St
         int M = Integer.parseInt(firstLine[0]);
         int N = Integer.parseInt(firstLine[1]);
 		
-        Vector grading = new Vector(new ArrayList<Integer>());
+        Vector grading = new Vector(new int[M*N]);
            
-		for(int i=1; i <= M*N; i++){
-        	grading.vec.add(Integer.parseInt(lines.get(i)));
-        }
+        for(int i=1; i <= M*N; i++){
+	    	grading.set(i-1,Integer.parseInt(lines.get(i)));
+	    }
 		
 		ArrayList<Integer> demands = new ArrayList<Integer>();
 		ArrayList<Integer> supplies = new ArrayList<Integer>();
@@ -1641,9 +1320,9 @@ private static ArrayList<Integer> SolveTransportation(ArrayList<String> outp, St
             	for(int i=0;i<j;i++){
             		for(int l=1;l<=N-1;l++){
                     	for(int k=0;k<l;k++){
-                    		VectorBinomial g1= new VectorBinomial(new ArrayList<Integer>(),0);
+                    		VectorBinomial g1= new VectorBinomial(new int[M*N],0);
                         	for(int x=0;x<M*N;x++){
-                        		g1.vec.add(0);
+                        		g1.set(x,0);
                         	}
                     		g1.set(i*N+l, 1);
                     		g1.set(j*N+k, 1);
@@ -1662,43 +1341,14 @@ private static ArrayList<Integer> SolveTransportation(ArrayList<String> outp, St
 			//	System.out.println(gB.get(i));
 			//}
 
-			Vector feasSolution = new Vector(new ArrayList<Integer>());
+			Vector feasSolution = NWCorner(demands, supplies);
 			
-			//NW corner
-			for(int i=0; i< M*N;i++){
-				feasSolution.vec.add(0);
-			}
 			
-			int j=0;
-			for(int i=0;i<N;i++){
-				if(demands.get(i)<=supplies.get(j)){
-					feasSolution.set(j*N+i,demands.get(i));
-					supplies.set(j,supplies.get(j)-demands.get(i));
-					if(supplies.get(j)==0){
-						j++;
-					}
-				}else{
-					feasSolution.set(j*N+i,supplies.get(j));
-					demands.set(i,demands.get(i)-supplies.get(j));
-					j++;
-					
-					while(demands.get(i)>supplies.get(j)){
-						feasSolution.set(j*N+i,feasSolution.get(j*N+i)+supplies.get(j));
-						demands.set(i,demands.get(i)-supplies.get(j));
-						j++;
-					}
-					feasSolution.set(j*N+i,feasSolution.get(j*N+i)+demands.get(i));
-					supplies.set(j,supplies.get(j)-demands.get(i));
-					if(supplies.get(j)==0){
-						j++;
-					}
-				}
-			}
 			
 			
 			System.out.println("FeasibleSolution: ");
 			for(int i=0;i<M;i++){
-				for(j=0;j<N;j++){
+				for(int j=0;j<N;j++){
 					System.out.print(feasSolution.get(i*N+j)+" ");
 				}
 				System.out.println();
@@ -1708,7 +1358,7 @@ private static ArrayList<Integer> SolveTransportation(ArrayList<String> outp, St
 			
 			System.out.println("OptimalSolution: "+feasSolution);
 			for(int i=0;i<M;i++){
-				for(j=0;j<N;j++){
+				for(int j=0;j<N;j++){
 					System.out.print(feasSolution.get(i*N+j)+" ");
 				}
 				System.out.println();
@@ -1750,8 +1400,26 @@ private static ArrayList<Integer> SolveTransportation(ArrayList<String> outp, St
 		/**************TESTING THINGS*******************/
 		//Solve vcover
 		ArrayList<String> outp = new ArrayList<String>();
-		//SolveVertexCover(outp, "./data/vcov_6_7");
-		FindGBTransportation(outp,"./data/transp_samples/samples_"+8+"x"+8+"/"+"transp_"+8+"x"+8+"_0.txt");
+		
+		int[] X=new int[15000];		
+		ArrayList<Integer> xlist = new ArrayList<Integer>();
+		
+		long start=System.currentTimeMillis();
+		for(int i=0;i<15000;i++){
+			X[i]=10*10*5-20;
+			X[i]=X[i]*2;
+		}
+		System.out.println(System.currentTimeMillis()-start);
+		
+		start=System.currentTimeMillis();
+		for(int i=0;i<15000;i++){
+			xlist.add(10*10*5-20);
+			xlist.set(i,xlist.get(i)*2);
+		}
+		System.out.println(System.currentTimeMillis()-start);
+		
+		SolveVertexCover(outp, "./data/vcov_20_33");
+		//FindGBTransportation(outp,"./data/transp_samples/samples_"+8+"x"+8+"/"+"transp_"+8+"x"+8+"_0.txt");
 		
 		
 		/*************KNAPSACKTESTS*****************/

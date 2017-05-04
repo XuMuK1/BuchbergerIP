@@ -7,23 +7,26 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class VectorBinomial extends Vector {
 	public int firstValuableVariable=0;	
 	
-	public VectorBinomial(ArrayList<Integer> Vec, int Last){
+	public VectorBinomial(int[] Vec, int Last){
 		firstValuableVariable=Last;
-		vec=Vec;	
+		vec=Vec.clone();
+		size=Vec.length;
 	}
 	
 	public VectorBinomial(Vector vecc, int Last){
 		firstValuableVariable=Last;
-		vec=vecc.vec;	
+		vec=vecc.vec.clone();	
+		size=vecc.size;
 	}
 	
 	public VectorBinomial copyVectorBinomial() {
 		// TODO Auto-generated method stub
-		VectorBinomial vB = new VectorBinomial(new ArrayList<>(this.vec),this.firstValuableVariable);
+		VectorBinomial vB = new VectorBinomial(Arrays.copyOf(vec, vec.length),this.firstValuableVariable);
 		return vB;
 	}
 
@@ -67,7 +70,7 @@ public class VectorBinomial extends Vector {
 		
 		for(int i=0; i < Size();i++){
 			
-			if (vec.get(i) < other.vec.get(i)){
+			if (vec[i] < other.vec[i]){
 				
 				if(isSet){
 					if(result == 1){
@@ -80,7 +83,7 @@ public class VectorBinomial extends Vector {
 				
 			}else{
 				
-				if (vec.get(i) > other.vec.get(i)){
+				if (vec[i] > other.vec[i]){
 					
 					if(isSet){
 						if(result == -1){
@@ -111,7 +114,7 @@ public class VectorBinomial extends Vector {
 		
 		for(int i=0; i < Size();i++){
 			
-			if (vec.get(i) < other.vec.get(i)){
+			if (vec[i] < other.vec[i]){
 				
 				if(isSet){
 					if(result == 1){
@@ -124,7 +127,7 @@ public class VectorBinomial extends Vector {
 				
 			}else{
 				
-				if (vec.get(i) > other.vec.get(i)){
+				if (vec[i] > other.vec[i]){
 					
 					if(isSet){
 						if(result == -1){
@@ -153,7 +156,7 @@ public class VectorBinomial extends Vector {
 		
 		for(int i=0; i < Size();i++){
 			
-			if (vec.get(i) < cons){
+			if (vec[i] < cons){
 				
 				if(isSet){
 					if(result == 1){
@@ -166,7 +169,7 @@ public class VectorBinomial extends Vector {
 				
 			}else{
 				
-				if (vec.get(i) > cons){
+				if (vec[i] > cons){
 					
 					if(isSet){
 						if(result == -1){
@@ -194,10 +197,10 @@ public class VectorBinomial extends Vector {
 		
 		for(int i=0; i < Size();i++){
 			
-			if (vec.get(i) < other.vec.get(i)){
+			if (vec[i] < other.vec[i]){
 				return -1;
 			}else{
-				if (vec.get(i) > other.vec.get(i)){
+				if (vec[i] > other.vec[i]){
 					return 1;
 				}
 				
@@ -214,10 +217,10 @@ public class VectorBinomial extends Vector {
 		
 		for(int i=0; i < Size();i++){
 			
-			if (vec.get(i) < cons){
+			if (vec[i] < cons){
 				return -1;
 			}else{
-				if (vec.get(i) > cons){
+				if (vec[i] > cons){
 					return 1;
 				}
 				
@@ -237,10 +240,10 @@ public class VectorBinomial extends Vector {
 		
 		for(int i= Size()-1; i >=0;i--){
 			
-			if (vec.get(i) < other.vec.get(i)){
+			if (vec[i] < other.vec[i]){
 				return 1;
 			}else{
-				if (vec.get(i) > other.vec.get(i)){
+				if (vec[i] > other.vec[i]){
 					return -1;
 				}
 				
@@ -255,10 +258,10 @@ public class VectorBinomial extends Vector {
 		
 		for(int i= Size()-1; i >=0;i--){
 			
-			if (vec.get(i) < cons){
+			if (vec[i] < cons){
 				return 1;
 			}else{
-				if (vec.get(i) > cons){
+				if (vec[i] > cons){
 					return -1;
 				}
 				
@@ -283,7 +286,7 @@ public class VectorBinomial extends Vector {
 		double deg2=0;
 		
 		for(int i= Size()-1; i >=0;i--){
-			deg1+=vec.get(i)*grading.get(i);
+			deg1+=vec[i]*grading.get(i);
 			deg2+=other.get(i)*grading.get(i);
 		}
 		
@@ -312,7 +315,7 @@ public class VectorBinomial extends Vector {
 		double deg2=0;
 		
 		for(int i= Size()-1; i >=0;i--){
-			deg1+=vec.get(i)*grading.get(i);
+			deg1+=vec[i]*grading.get(i);
 			deg2+=cons*grading.get(i);
 		}
 		
@@ -342,7 +345,7 @@ public class VectorBinomial extends Vector {
 		double deg2=0;
 
 		for(int i= Size()-1; i >=0;i--){
-			deg1+=vec.get(i)*grading.get(i);
+			deg1+=vec[i]*grading.get(i);
 			deg2+=other.get(i)*grading.get(i);
 		}
 
@@ -371,7 +374,7 @@ public class VectorBinomial extends Vector {
 		double deg2=0;
 
 		for(int i= Size()-1; i >=0;i--){
-			deg1+=vec.get(i)*grading.get(i);
+			deg1+=vec[i]*grading.get(i);
 			deg2+=cons*grading.get(i);
 		}
 
@@ -401,10 +404,10 @@ public class VectorBinomial extends Vector {
 		//Block1 Lex for t's
 		for(int i = 0; i < firstValuableVariable;i++){
 	
-			if (vec.get(i) < other.vec.get(i)){
+			if (vec[i] < other.vec[i]){
 				return 1;
 			}else{
-				if (vec.get(i) > other.vec.get(i)){
+				if (vec[i] > other.vec[i]){
 					return -1;
 				}
 				
@@ -418,7 +421,7 @@ public class VectorBinomial extends Vector {
 		double deg2=0;
 
 		for(int i= Size()-1; i >=firstValuableVariable;i--){
-			deg1+=vec.get(i)*grading.get(i-firstValuableVariable);
+			deg1+=vec[i]*grading.get(i-firstValuableVariable);
 			deg2+=other.get(i)*grading.get(i-firstValuableVariable);
 		}
 
@@ -447,10 +450,10 @@ public class VectorBinomial extends Vector {
 		//Block1 Lex for t's
 		for(int i = 0; i < firstValuableVariable;i++){
 	
-			if (vec.get(i) < cons){
+			if (vec[i] < cons){
 				return 1;
 			}else{
-				if (vec.get(i) > cons){
+				if (vec[i] > cons){
 					return -1;
 				}
 				
@@ -464,7 +467,7 @@ public class VectorBinomial extends Vector {
 		double deg2=0;
 
 		for(int i= Size()-1; i >=firstValuableVariable;i--){
-			deg1+=vec.get(i)*grading.get(i-firstValuableVariable);
+			deg1+=vec[i]*grading.get(i-firstValuableVariable);
 			deg2+=cons*grading.get(i-firstValuableVariable);
 		}
 
@@ -494,10 +497,10 @@ public class VectorBinomial extends Vector {
 		//Block1 Lex for t's
 		for(int i = 0; i < firstValuableVariable;i++){
 
-			if (vec.get(i) < other.vec.get(i)){
+			if (vec[i] < other.vec[i]){
 				return 1;
 			}else{
-				if (vec.get(i) > other.vec.get(i)){
+				if (vec[i] > other.vec[i]){
 					return -1;
 				}
 
@@ -511,7 +514,7 @@ public class VectorBinomial extends Vector {
 		double deg2=0;
 		
 		for(int i= Size()-1; i >=firstValuableVariable;i--){
-			deg1+=vec.get(i)*grading.get(i-firstValuableVariable);
+			deg1+=vec[i]*grading.get(i-firstValuableVariable);
 			deg2+=other.get(i)*grading.get(i-firstValuableVariable);
 		}
 		
@@ -539,10 +542,10 @@ public class VectorBinomial extends Vector {
 		//Block1 Lex for t's
 		for(int i = 0; i < firstValuableVariable;i++){
 
-			if (vec.get(i) < cons){
+			if (vec[i] < cons){
 				return -1;
 			}else{
-				if (vec.get(i) > cons){
+				if (vec[i] > cons){
 					return 1;
 				}
 
@@ -556,7 +559,7 @@ public class VectorBinomial extends Vector {
 		double deg2=0;
 		
 		for(int i= firstValuableVariable; i <Size();i++){
-			deg1+=vec.get(i)*grading.get(i-firstValuableVariable);
+			deg1+=vec[i]*grading.get(i-firstValuableVariable);
 			deg2+=cons*grading.get(i-firstValuableVariable);
 		}
 		
@@ -577,29 +580,29 @@ public class VectorBinomial extends Vector {
 	/////ATTENTION, IT USES GRLEX
 	public void TransformToPlus(Vector grading) throws Exception{
 			if (CompareBlockGLex(0, grading)<0){
-				for (int i=0; i< vec.size(); i++){
-					vec.set(i, -vec.get(i));
+				for (int i=0; i< size; i++){
+					this.set(i, -vec[i]);
 				}
 			}
 	}
 	
 	public void TransformToMinus(Vector grading) throws Exception{
 		if (CompareBlockGLex(0, grading)>0){
-			for (int i=0; i< vec.size(); i++){
-				vec.set(i, -vec.get(i));
+			for (int i=0; i< size; i++){
+				this.set(i, -vec[i]);
 			}
 		}
 }
 	
 	public VectorBinomial Plus(){
 		
-		VectorBinomial result = new VectorBinomial(new ArrayList<Integer>(), firstValuableVariable);
-		for (int i=0; i < vec.size() ; i++){
+		VectorBinomial result = new VectorBinomial(new int[size], firstValuableVariable);
+		for (int i=0; i < size ; i++){
 			
-			if(vec.get(i)>0){
-				result.vec.add(vec.get(i));
+			if(vec[i]>0){
+				result.set(i,vec[i]);
 			}else{
-				result.vec.add(0);
+				result.set(i,0);
 			}
 			
 		}
@@ -610,13 +613,13 @@ public class VectorBinomial extends Vector {
 	
 	public VectorBinomial Minus(){
 		
-		VectorBinomial result = new VectorBinomial(new ArrayList<Integer>(), firstValuableVariable);
-		for (int i=0; i < vec.size() ; i++){
+		VectorBinomial result = new VectorBinomial(new int[size], firstValuableVariable);
+		for (int i=0; i < size ; i++){
 			
-			if(vec.get(i)<0){
-				result.vec.add(vec.get(i));
+			if(vec[i]<0){
+				result.set(i,vec[i]);
 			}else{
-				result.vec.add(0);
+				result.set(i,0);
 			}
 			
 		}
@@ -683,7 +686,7 @@ public class VectorBinomial extends Vector {
 			wasReduction = false;
 			
 			if(IterationCriterion(this, V, iter)){//DROP IT
-				/*for(int i=0;i<this.vec.size();i++){
+				/*for(int i=0;i<this.size;i++){
 					this.vec.set(i,0);
 					
 				}*/
@@ -702,7 +705,7 @@ public class VectorBinomial extends Vector {
 					//zero test
 					int j;
 					for(j=0;j<V;j++){
-						if(vec.get(j)!=0){
+						if(vec[j]!=0){
 							break;
 						}
 					}
@@ -760,7 +763,7 @@ public class VectorBinomial extends Vector {
 			//System.out.println(spair.vec);
 			for(int i=0;i<V;i++){
 				
-				if(spair.vec.get(i)!=0){
+				if(spair.vec[i]!=0){
 					num++;
 					
 				}
@@ -828,7 +831,7 @@ public class VectorBinomial extends Vector {
 					
 					if(!BuchbCriterion(grobBasis.get(i), grobBasis.get(j))){
 						if(!ChainCriterion(i,j,grobBasis)){
-							VectorBinomial spair = new VectorBinomial(new ArrayList<Integer>(grobBasis.get(i).vec),grobBasis.get(i).firstValuableVariable);
+							VectorBinomial spair =grobBasis.get(i).copyVectorBinomial();
 							spair.Add(grobBasis.get(j),-1);
 							spair.TransformToPlus(grading);
 							if(!IterationCriterion(spair,V,iter)){
@@ -941,7 +944,7 @@ public class VectorBinomial extends Vector {
 					if(!BuchbCriterion(grobBasis.get(i), grobBasis.get(j))){
 						if(!ChainCriterion(i,j,grobBasis)){
 							if(!IterationCriterion(grobBasis.get(i), grobBasis.get(j),V,iter)){
-								VectorBinomial spair = new VectorBinomial(new ArrayList<Integer>(grobBasis.get(i).vec),grobBasis.get(i).firstValuableVariable);
+								VectorBinomial spair =grobBasis.get(i).copyVectorBinomial();
 								spair.Add(grobBasis.get(j),-1);
 								spair.TransformToPlus(grading);
 								String spairstr=spair.toString();
@@ -956,8 +959,8 @@ public class VectorBinomial extends Vector {
 									added=true;
 								}else{
 									zeroRed++;
-									System.out.println("REDUCED TO ZERO!! "+spairstr);
-									System.out.println("BASIS:\n "+grobBasis);
+									//System.out.println("REDUCED TO ZERO!! "+spairstr);
+									//System.out.println("BASIS:\n "+grobBasis);
 								}
 								critPairsConsidered++;
 							}
@@ -1012,7 +1015,7 @@ public class VectorBinomial extends Vector {
 					
 					if(!BuchbCriterion(grobBasis.get(i), grobBasis.get(j))){
 						if(!ChainCriterion(i,j,grobBasis)){
-							VectorBinomial spair = new VectorBinomial(new ArrayList<Integer>(grobBasis.get(i).vec),grobBasis.get(i).firstValuableVariable);
+							VectorBinomial spair =grobBasis.get(i).copyVectorBinomial();
 							spair.Add(grobBasis.get(j),-1);
 							spair.TransformToPlus(grading);
 							//System.out.println("Spair:"+spair);
@@ -1078,7 +1081,7 @@ public class VectorBinomial extends Vector {
 		for (int i=0; i< basis.size(); i++){
 			int j;
 			for (j=0;j<basis.get(i).firstValuableVariable; j++){
-				if (basis.get(i).vec.get(j) !=0){
+				if (basis.get(i).get(j) !=0){
 					break;
 				}
 			}
@@ -1135,7 +1138,7 @@ public class VectorBinomial extends Vector {
 			//System.out.println(current);
 		}
 		
-		res.add(Vector.copyVector(current));
+		res.add(Vector.copyVector(current,current.size));
 		int curIndex=res.size()-1;
 		for(int i=0;i< basis.size(); i++){
 			if(basis.get(i).CompareTotally(Vector.Mul(current, -1))==1){
@@ -1231,8 +1234,8 @@ public class VectorBinomial extends Vector {
 		return -1;// oh no
 	}
 	
-	public static ArrayList<VectorBinomial> FindVCoverGB(ArrayList<ArrayList<Integer>> edges, Vector grading) throws Exception{
-		VectorBinomial g = new VectorBinomial(new ArrayList<Integer>(), 0);
+	/*public static ArrayList<VectorBinomial> FindVCoverGB(ArrayList<ArrayList<Integer>> edges, Vector grading) throws Exception{
+		VectorBinomial g = new VectorBinomial(new int[], 0);
 		ArrayList<VectorBinomial> basis = new ArrayList<VectorBinomial>();
 		
 		//init
@@ -1249,9 +1252,7 @@ public class VectorBinomial extends Vector {
 		for(int i=0; i<edges.size();i++){
 			extgrading.vec.add(0);
 		}
-		/*for(int i=0; i<grading.Size();i++){
-			extgrading.vec.add(1);
-		}*/
+		
 		
 		while(k<=grading.Size()){
 			System.out.println("Considering k="+k);
@@ -1283,15 +1284,13 @@ public class VectorBinomial extends Vector {
 					//System.out.println("seq:" + seq);
 					//System.out.print("g:" + g);
 					if(g.CompareBlockGLex(0, grading)>0){
-						/*System.out.println("+");*/
+						
 						VectorBinomial g1 = AddSlacks(g,basis,grading.Size(),edges,extgrading,k-1);
 						if(g1!=null){
 							basis.add(g1);
 							System.out.println(k+"BASIS SIZE:"+basis.size());
 						}
-					}/*else{
-						System.out.println("-");
-					}*/
+					}
 					for(int j=0;j<keys.size();j++){
 						g.set(keys.get(j), 0);
 					}
@@ -1332,9 +1331,7 @@ public class VectorBinomial extends Vector {
 		ArrayList<Integer> keys = new ArrayList<Integer>();//included vertices
 		ArrayList<Integer> seq = new ArrayList<Integer>();//assigned numbers
 		
-		/*for(int i=0; i<grading.Size();i++){
-			extgrading.vec.add(1);
-		}*/
+		
 		
 		while(k<=(grading.Size()-1)/2){
 			System.out.println("Considering k="+k);
@@ -1366,15 +1363,13 @@ public class VectorBinomial extends Vector {
 					//System.out.println("seq:" + seq);
 					//System.out.print("g:" + g);
 					if(g.CompareBlockGLex(0, grading)>0){
-						/*System.out.println("+");*/
+						
 						VectorBinomial g1 = AddSlacksKnapsack(g,basis,(grading.Size()-1)/2,weights,grading);
 						if(g1!=null){
 							basis.add(g1);
 							System.out.println(k+"BASIS SIZE:"+basis.size());
 						}
-					}/*else{
-						System.out.println("-");
-					}*/
+					}
 					for(int j=0;j<keys.size();j++){
 						g.set(keys.get(j), 0);
 					}
@@ -1419,9 +1414,7 @@ public class VectorBinomial extends Vector {
 			}
 			g1.vec.add(res);
 		}
-		/*for(int i=0;i<size;i++){
-			g1.vec.add(-g1.get(i));
-		}*/
+		
 		
 		/*VectorBinomial g2=g1.Plus();
 		for(int i=0;i<basis.size();i++){
@@ -1429,7 +1422,7 @@ public class VectorBinomial extends Vector {
 			if(buf*(1-buf)==0){
 				return null;
 			}
-		}*/
+		}
 		g1.ReduceByList(basis, grading,size,iter);
 		if(g1.CompareTotally(0)==0){
 			return null;
@@ -1461,7 +1454,7 @@ public class VectorBinomial extends Vector {
 			if(buf*(1-buf)==0){
 				return null;
 			}
-		}*/
+		}
 		g1.ReduceByList(basis, grading);
 		if(g1.CompareTotally(0)==0){
 			return null;
@@ -1469,7 +1462,8 @@ public class VectorBinomial extends Vector {
 		
 		return g1;
 	}
-
+*/
+	/*
 	public static ArrayList<VectorBinomial> MinimizeBinaryBasis(ArrayList<VectorBinomial> basis) throws Exception {
 		// TODO Auto-generated method stub
 		ArrayList<VectorBinomial> newBasis = new ArrayList<VectorBinomial>();
@@ -1492,7 +1486,7 @@ public class VectorBinomial extends Vector {
 		
 	}
 	
-
+*/
 	/***********FAUGERE algorithms****************/
 	
 	public Vector mult = new Vector();
@@ -1517,7 +1511,7 @@ public class VectorBinomial extends Vector {
 					//System.out.println("i="+i+"  j="+j);
 					
 					if(!BuchbCriterion(grobBasis.get(i), grobBasis.get(j))){
-						VectorBinomial spair = new VectorBinomial(new ArrayList<Integer>(grobBasis.get(i).vec),grobBasis.get(i).firstValuableVariable);
+						VectorBinomial spair =grobBasis.get(i).copyVectorBinomial();
 						spair.Add(grobBasis.get(j),-1);
 						spair.TransformToPlus(grading);
 						//System.out.println("Spair:"+spair);
