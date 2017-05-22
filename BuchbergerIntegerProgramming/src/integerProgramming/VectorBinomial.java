@@ -905,6 +905,8 @@ public class VectorBinomial extends Vector {
 		return true;
 	}
 	
+	
+	
 	private static boolean ChainCriterion(int i, int j, ArrayList<VectorBinomial> grobBasis) {
 		// TODO Auto-generated method stub
 		for(int k=0;k<i;k++){
@@ -1059,8 +1061,8 @@ public class VectorBinomial extends Vector {
 			int j=0;
 			for (j=0;j<basis.size();j++){
 				if(i!=j){
-					VectorBinomial aa = basis.get(j).Plus();
-					aa.Add(basis.get(i).Plus(),-1);
+					/*VectorBinomial aa = basis.get(j).Plus();
+					aa.Add(basis.get(i).Plus(),-1);*/
 					
 					if(basis.get(j).Plus().CompareTotally(basis.get(i).Plus())<0){
 						break;
@@ -1091,6 +1093,27 @@ public class VectorBinomial extends Vector {
 		}
 		
 		return toRemain;
+	}
+	
+	public static ArrayList<Vector> Enumerate(ArrayList<String> info, Vector optimum, ArrayList<VectorBinomial> basis) throws Exception{
+		//with LOG info
+		ArrayList<Vector> feasSet=new ArrayList<Vector>();
+		ArrayList<ArrayList<Integer>> adjacency = new ArrayList<ArrayList<Integer>>();
+		ArrayList<Vector> edges= new ArrayList<Vector>();
+		enumer(adjacency,edges, feasSet,optimum, basis,0);
+		info.add(adjacency.size()+"");
+		
+		/*for(int i=0; i<adjacency.size();i++){
+			System.out.println("TRAVEL");
+			System.out.println("from");
+			System.out.println(feasSet.get(adjacency.get(i).get(0)));
+			System.out.println("through");
+			System.out.println(edges.get(i));
+			System.out.println("to");
+			System.out.println(feasSet.get(adjacency.get(i).get(1)));
+		}*/
+		return feasSet;
+		
 	}
 	
 	public static ArrayList<Vector> Enumerate(Vector optimum, ArrayList<VectorBinomial> basis) throws Exception{
@@ -1138,7 +1161,16 @@ public class VectorBinomial extends Vector {
 			//System.out.println(current);
 		}
 		
+		
 		res.add(Vector.copyVector(current,current.size));
+		/*if(res.size()>100){
+			System.out.println("OGNO");
+			for(Vector v: res){
+				
+				System.out.println(v);
+			}
+			return;
+		}*/
 		int curIndex=res.size()-1;
 		for(int i=0;i< basis.size(); i++){
 			if(basis.get(i).CompareTotally(Vector.Mul(current, -1))==1){
@@ -1158,25 +1190,162 @@ public class VectorBinomial extends Vector {
 					
 					edges.add(basis.get(i));
 					
-					continue;
+					
+				}else{
+					/*System.out.println("TRAVELING");
+					System.out.println("from");
+					System.out.println(current);*/
+					
+					adjacency.add(new ArrayList<>());
+					adjacency.get(adjacency.size()-1).add(curIndex);
+					adjacency.get(adjacency.size()-1).add(res.size());
+					
+					edges.add(basis.get(i));
+					
+					enumer(adjacency,edges,res,current,basis,curIndex);
+					
+					current.Add(basis.get(i),-1);
 				}
-				/*System.out.println("TRAVELING");
-				System.out.println("from");
-				System.out.println(current);*/
 				
-				adjacency.add(new ArrayList<>());
-				adjacency.get(adjacency.size()-1).add(curIndex);
-				adjacency.get(adjacency.size()-1).add(res.size());
-				
-				edges.add(basis.get(i));
-				
-				enumer(adjacency,edges,res,current,basis,curIndex);
-				current.Add(basis.get(i),-1);
 			}
+			
 		}
 		return;
 		
 	}
+
+	/********************Constructing GB from enumeration of knapsack items with unit weights
+	 * @throws Exception ******************/
+	
+	public static ArrayList<VectorBinomial> ConstructVCoverGBFromUnitKnapsack(ArrayList<VectorBinomial> startGB, Vector grading,int V,int K) throws Exception{
+		ArrayList<VectorBinomial> knapsackStart = new ArrayList<VectorBinomial>();
+		
+		for(int i=0;i<V;i++){
+			VectorBinomial g = new VectorBinomial(new int[V*2+2],0);
+			g.vec[0]=-1;
+			g.vec[1]=1;
+			g.vec[i+2]=-1;
+			g.vec[V+i+2]=+1;
+			for(int j=2;j<2*V+2;j++){
+				if(j!=i+2 && j!=V+i+2){
+					g.vec[j]=0;
+				}
+			}
+			knapsackStart.add(g);
+			/*for(int j=i+1;j<V;j++){
+				VectorBinomial g1 = new VectorBinomial(new int[V*2+2],0);
+				g1.vec[0]=0;
+				g1.vec[1]=0;
+				g1.vec[i+2]=1;
+				g1.vec[j+2]=-1;
+				g1.vec[V+i+2]=-1;
+				g1.vec[V+j+2]=1;
+				for(int j1=2;j1<2*V+2;j1++){
+					if(j1!=i+2 && j1!=V+i+2){
+						g1.vec[j1]=0;
+					}
+				}
+				knapsackStart.add(g1);
+			}*/
+		}
+		
+		
+		ArrayList<String> info = new ArrayList<String>();
+		
+		Vector feasSol = new Vector(new int[2*V+2]);
+		feasSol.vec[0]=0;
+		feasSol.vec[1]=K;
+		for(int i=0;i<V;i++){
+			feasSol.vec[i+2]=1;
+			feasSol.vec[i+2+V]=1;
+		}
+		System.out.println("feas:"+feasSol);
+		feasSol.FindNormalForm(knapsackStart);
+		System.out.println("opt:"+feasSol);
+		System.out.println("ENUMERATING");
+		ArrayList<Vector> startSet= Enumerate(info,feasSol,knapsackStart);
+		System.out.println(info);		
+		
+		ArrayList<VectorBinomial> gB = new ArrayList<VectorBinomial>();
+		
+		/*for(int i=0;i<5;i++){
+			System.out.println(startSet.get(i));
+		}*/
+		for(int i=0;i<startSet.size();i++){
+			VectorBinomial g = new VectorBinomial(new int[startGB.get(0).size],0);
+			boolean nZ=false;//NonZero
+			for(int j=0;j<V;j++){
+				g.vec[j]=startSet.get(i).vec[j+2]-1;
+				g.vec[j+V]=-g.vec[j];//startSet.get(i).vec[j+V+2]-1;
+				if(g.vec[j]!=0){
+					nZ=true;
+				}
+			}
+			
+			
+			
+			if(!nZ){
+				continue;
+			}
+			
+			for(int j=2*V;j<startGB.get(0).size;j++){
+				g.vec[j]=0;
+			}
+			
+			for(int k=0;k<V;k++){
+				if(startSet.get(i).vec[k+2]!=1){
+					
+					for(int k1=2*V;k1<startGB.get(0).size;k1++){
+						g.vec[k1]+=startGB.get(k).vec[k1]*(startSet.get(i).vec[k+2]-1);
+					}
+				}
+			}
+			g.TransformToPlus(grading);
+			
+			int k=0;
+			for(k=0;k<gB.size();k++){
+				if(gB.get(k).Divides(g)){
+					break;
+				}
+			}
+			if(k==gB.size()){
+				gB.add(g);
+			}
+		}
+		
+		System.out.println("GB SIZE: "+gB.size());
+		/*for(int i=0;i<5;i++){
+			System.out.println(gB.get(i));
+		}*/
+		
+		
+		
+		return gB;
+		
+	}
+	
+	
+	
+	private boolean Divides(VectorBinomial g) {
+		// TODO Auto-generated method stub
+		
+		for(int i=0;i<g.Size();i++){
+			if(this.vec[i]>0){
+				if(this.vec[i]>g.vec[i]){
+					return false;
+				}
+			}
+		}
+		/*System.out.println("Divisible??");
+		System.out.println(this);
+		System.out.println(g);*/
+		return true;
+		
+	}
+
+	/********************knapsackUnitEnumeration********************************/
+	
+	/************AlgorithmicAttempt to construct GB*******************/
 	
 	private static int IncrementAsVCovSeq(ArrayList<Integer> seq){
 		//ternary system 0 1 -1

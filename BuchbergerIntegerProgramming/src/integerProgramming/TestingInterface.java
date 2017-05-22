@@ -163,7 +163,8 @@ public class TestingInterface {
         	grading.vec.add(0);
         }*/ //ARRAYLISTS
 		
-        ArrayList<Integer> weights = new ArrayList<Integer>();
+        ArrayList<Integer> values = new ArrayList<Integer>();
+        
         for(int i=0; i < numberOfItems; i++){
         	String line = lines.get(i+1);
         	String[] parts = line.split("\\s+");
@@ -185,14 +186,15 @@ public class TestingInterface {
         	}*///ARRAY LSITS
     		
     		gs.add(g1);
-    		
-    		grading.set(i,1+weights.get(i));
-    		grading.set(i+numberOfItems,Integer.parseInt(parts[0])+1);
+    		values.add(Integer.parseInt(parts[0]));
+    		grading.set(i,1+Integer.parseInt(parts[1]));//weight
+    		grading.set(i+numberOfItems,Integer.parseInt(parts[0])+1);//value
         }
-        System.out.println(grading);
+        //System.out.println(grading);
         
 		
         try {
+        	System.out.println("Solving "+values.size()+"item instance");
         	long start = System.currentTimeMillis();
 			ArrayList<VectorBinomial> gB = VectorBinomial.BuchbergerAlgorithm(outp,gs, grading);
 			gB=VectorBinomial.MinimizeBasis(gB);
@@ -210,16 +212,22 @@ public class TestingInterface {
 			System.out.println("OptimalSolution: "+feasSolution);
 			outp.add(""+((double)(System.currentTimeMillis()-start))/1000);
 			System.out.println("CORRECTNESS");
+			
+			start = System.currentTimeMillis();
 			int[] bab=BaBKnapsack.solveProblem(fileName);
-			int test=0;
+			outp.add(""+((double)(System.currentTimeMillis()-start))/1000);
+			
+			int res1=0;
+			int res2=0;
 			for(int i=0;i<bab.length;i++){
-				test=feasSolution.get(i+1)-bab[i];
-				if(test!=0){
-					System.out.println("NO!!!!");
-				}
+				res1+=values.get(i)*feasSolution.get(i+1);
+				res2+=values.get(i)*bab[i];
 			}
-			if(test==0){
+			if(res1==res2){
 				System.out.println("YES!");
+			}else{
+				System.out.println("NO!");
+				System.out.println(res1 +"vs"+res2);
 			}
 			int maxdeg=0;
 			int maxcoord=0;
@@ -758,6 +766,266 @@ public class TestingInterface {
 	*/
 	private static String out="";
 	
+	public static int[] TestUnitKnapsackGB(String fileName) throws IOException{
+		
+		if(fileName == null)
+            throw new FileNotFoundException("No such file");
+        
+        // read the lines out of the file
+        List<String> lines = new ArrayList<String>();
+
+        BufferedReader input =  new BufferedReader(new FileReader(fileName));
+        try {
+            String line = null;
+            while (( line = input.readLine()) != null){
+                lines.add(line);
+            }
+        }
+        finally {
+            input.close();
+        }
+        //System.out.println(lines.size());
+        
+        // parse the data in the file
+        String[] firstLine = lines.get(0).split("\\s+");
+        int N = Integer.parseInt(firstLine[0]);
+        int E = Integer.parseInt(firstLine[1]);
+		
+        Vector grading = new Vector(new int[2*N+E]);
+        ArrayList<VectorBinomial> gs = new ArrayList<VectorBinomial>();
+        
+        
+		for(int i=1; i <= N; i++){
+        	grading.set(i-1,1);//Integer.parseInt(lines.get(i)), for simplicity
+        	grading.set(N+i-1,0);
+        	
+        	VectorBinomial g1= new VectorBinomial(new int[2*N+E],0);
+        	for(int j=0; j<2*N+E; j++){
+        		g1.set(j,0);
+        	}
+        	g1.set(i-1,1);
+        	g1.set(N+i-1,-1);//bounded problem
+        	
+        	gs.add(g1);
+        	
+        }
+		
+		ArrayList<ArrayList<Integer>> edges = new ArrayList<ArrayList<Integer>>();
+		
+        for(int i=N+1; i <=N+E; i++){
+        	String line = lines.get(i);
+        	String[] parts = line.split("\\s+");
+        	
+        	ArrayList<Integer> edge = new ArrayList<Integer>();
+        	edge.add(Integer.parseInt(parts[0]));
+        	edge.add(Integer.parseInt(parts[1]));
+        	edges.add(edge);
+        	
+        	gs.get(Integer.parseInt(parts[0])).set(i-N-1+N+N,1);
+        	gs.get(Integer.parseInt(parts[1])).set(i-N-1+N+N,1);
+        	grading.set(i+N-1,500);//for slacks
+        	
+        }
+        
+        System.out.println("VectorSize "+gs.get(0));
+        //for(int i=0;i<gs.size();i++){
+		//	System.out.println(gs.get(i));
+		//}
+        //System.out.println(grading);
+		System.out.println("Trying to solve the problem: V="+N+" E="+E);
+        try {
+        	long startTime = System.currentTimeMillis();
+        	
+        	for(VectorBinomial gg: gs){
+        		System.out.println(gg);
+        	}
+			ArrayList<VectorBinomial> gB = VectorBinomial.ConstructVCoverGBFromUnitKnapsack(gs, grading, N, N);
+			out+=""+gB.size();
+			System.out.println("gB");
+			/*for(int i=0;i<gB.size();i++){
+				System.out.println(gB.get(i));
+			}*/
+
+			
+			gB=VectorBinomial.MinimizeBasis(gB);
+			out+=" & "+gB.size();
+			
+			System.out.println("Minimized GB: "+gB.size());
+			
+			
+			Vector feasSolution = new Vector(new int[2*N+E]);
+			
+			//i.e. take ALL
+			for(int i=0; i< N;i++){
+				feasSolution.set(i,1);
+				feasSolution.set(i+N,0);
+			}
+			
+			for(int i=2*N; i< feasSolution.size;i++){
+				feasSolution.set(i,1);
+				
+			}
+			
+			
+			System.out.println("FeasibleSolution: "+feasSolution);
+			feasSolution.FindNormalForm(gB);
+			System.out.println("OptimalSolution: "+feasSolution);
+			long endTime   = System.currentTimeMillis();
+        	long totalTime = endTime - startTime;
+        	System.out.println("Execution Time:"+(double)(totalTime)/1000);//seconds
+			out+=" & "+(double)(totalTime)/1000;
+        	
+        	
+			return feasSolution.vec;
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
+		return null;
+	}
+	
+public static int[] SolveBoundedVCover(String fileName) throws IOException{
+		
+		if(fileName == null)
+            throw new FileNotFoundException("No such file");
+        
+        // read the lines out of the file
+        List<String> lines = new ArrayList<String>();
+
+        BufferedReader input =  new BufferedReader(new FileReader(fileName));
+        try {
+            String line = null;
+            while (( line = input.readLine()) != null){
+                lines.add(line);
+            }
+        }
+        finally {
+            input.close();
+        }
+        //System.out.println(lines.size());
+        
+        // parse the data in the file
+        String[] firstLine = lines.get(0).split("\\s+");
+        int N = Integer.parseInt(firstLine[0]);
+        int E = Integer.parseInt(firstLine[1]);
+		
+        Vector grading = new Vector(new int[2*N+E]);
+        ArrayList<VectorBinomial> gs = new ArrayList<VectorBinomial>();
+        
+        
+		for(int i=1; i <= N; i++){
+        	grading.set(i-1,1);//Integer.parseInt(lines.get(i)), for simplicity
+        	grading.set(N+i-1,0);
+        	
+        	VectorBinomial g1= new VectorBinomial(new int[2*N+E],0);
+        	for(int j=0; j<2*N+E; j++){
+        		g1.set(j,0);
+        	}
+        	g1.set(i-1,1);
+        	g1.set(N+i-1,-1);//bounded problem
+        	
+        	gs.add(g1);
+        	
+        }
+		
+		ArrayList<ArrayList<Integer>> edges = new ArrayList<ArrayList<Integer>>();
+		
+        for(int i=N+1; i <=N+E; i++){
+        	String line = lines.get(i);
+        	String[] parts = line.split("\\s+");
+        	
+        	ArrayList<Integer> edge = new ArrayList<Integer>();
+        	edge.add(Integer.parseInt(parts[0]));
+        	edge.add(Integer.parseInt(parts[1]));
+        	edges.add(edge);
+        	
+        	gs.get(Integer.parseInt(parts[0])).set(i-N-1+N+N,1);
+        	gs.get(Integer.parseInt(parts[1])).set(i-N-1+N+N,1);
+        	grading.set(i+N-1,500);//for slacks
+        	
+        }
+        
+        System.out.println("VectorSize "+gs.get(0));
+        //for(int i=0;i<gs.size();i++){
+		//	System.out.println(gs.get(i));
+		//}
+        //System.out.println(grading);
+		System.out.println("Trying to solve the problem: V="+N+" E="+E);
+        try {
+        	long startTime = System.currentTimeMillis();
+        	
+        	for(VectorBinomial gg: gs){
+        		System.out.println(gg);
+        	}
+			ArrayList<String> outp=new ArrayList<String>();
+			ArrayList<VectorBinomial> gB = VectorBinomial.BuchbergerAlgorithm(outp, gs, grading);
+			//ArrayList<VectorBinomial> gB2 = VectorBinomial.ConstructVCoverGBFromUnitKnapsack(gs, grading, N, N);
+			
+			
+			/*for(int i=0;i<gB.size();i++){
+				System.out.println(gB.get(i));
+			}*/
+
+			
+			gB=VectorBinomial.MinimizeBasis(gB);
+			//gB2=VectorBinomial.MinimizeBasis(gB2);
+			out+=" & "+gB.size();
+			
+			System.out.println("Minimized GB: "+gB.size());
+			//System.out.println("Minimized GB2: "+gB2.size());
+			
+			/*int[] cnt = new int[gB2.size()];
+			int sum=44;
+			for(int i=0;i<gB2.size();i++){
+				cnt[i]=1;
+				for(int j=i+1;j<gB2.size();j++){
+					
+						if(gB2.get(i).eq(gB2.get(j))){
+							cnt[i]++;
+							sum--;
+						}
+					
+				}
+			}*/
+			
+			out+=""+gB.size();
+			/*System.out.println("gB sum "+sum);*/
+			
+			
+			Vector feasSolution = new Vector(new int[2*N+E]);
+			
+			//i.e. take ALL
+			for(int i=0; i< N;i++){
+				feasSolution.set(i,1);
+				feasSolution.set(i+N,0);
+			}
+			
+			for(int i=2*N; i< feasSolution.size;i++){
+				feasSolution.set(i,1);
+				
+			}
+			
+			
+			System.out.println("FeasibleSolution: "+feasSolution);
+			feasSolution.FindNormalForm(gB);
+			System.out.println("OptimalSolution: "+feasSolution);
+			long endTime   = System.currentTimeMillis();
+        	long totalTime = endTime - startTime;
+        	System.out.println("Execution Time:"+(double)(totalTime)/1000);//seconds
+			out+=" & "+(double)(totalTime)/1000;
+        	
+        	
+			return feasSolution.vec;
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
+		return null;
+	}
 	/**********TRANSPORTATION*******************/
 	private static Vector NWCorner(ArrayList<Integer> demands, ArrayList<Integer> supplies ){
 		Vector feasSolution = new Vector(new int[demands.size()*supplies.size()]);
@@ -1398,41 +1666,23 @@ private static int[] SolveTransportation(ArrayList<String> outp, String fileName
 		// TODO Auto-generated method stub
 		
 		/**************TESTING THINGS*******************/
-		//Solve vcover
-		ArrayList<String> outp = new ArrayList<String>();
+		TestUnitKnapsackGB("./data/vcov_10_14");
+		SolveBoundedVCover("./data/vcov_10_14");
 		
-		int[] X=new int[15000];		
-		ArrayList<Integer> xlist = new ArrayList<Integer>();
-		
-		long start=System.currentTimeMillis();
-		for(int i=0;i<15000;i++){
-			X[i]=10*10*5-20;
-			X[i]=X[i]*2;
-		}
-		System.out.println(System.currentTimeMillis()-start);
-		
-		start=System.currentTimeMillis();
-		for(int i=0;i<15000;i++){
-			xlist.add(10*10*5-20);
-			xlist.set(i,xlist.get(i)*2);
-		}
-		System.out.println(System.currentTimeMillis()-start);
-		
-		SolveVertexCover(outp, "./data/vcov_20_33");
 		//FindGBTransportation(outp,"./data/transp_samples/samples_"+8+"x"+8+"/"+"transp_"+8+"x"+8+"_0.txt");
 		
 		
 		/*************KNAPSACKTESTS*****************/
 		
-		//FileWriter fw = new FileWriter(".\\data\\knapsack_samples\\LOG.csv",false);
-		//BufferedWriter bw = new BufferedWriter(fw);
-		//bw.write("Problem,FullTime,GBSize,minGBSize,critPairs,zeroRed,maxDeg,maxCoord\n");
-		//bw.close();
+		/*FileWriter fw = new FileWriter(".\\data\\knapsack_samples\\LOG.csv",false);
+		BufferedWriter bw = new BufferedWriter(fw);
+		bw.write("Problem,FullTime,GBSize,minGBSize,critPairs,zeroRed,maxDeg,maxCoord,BaBTime\n");
+		bw.close();
 		
-		/*int maxWeight=5;
-		int Nsamples=3;
+		int maxWeight=5;
+		int Nsamples=5;
 		
-		for(int N=20;N<=40;N++){
+		for(int N=10;N<=40;N++){
 			SampleKnapsack(maxWeight, N, Nsamples);
 			
 	        List<String> lines = new ArrayList<String>();
@@ -1465,11 +1715,12 @@ private static int[] SolveTransportation(ArrayList<String> outp, String fileName
 				//	outp.add(time)
 				//	outp.add(maxdeg)	
 				 
-	        	FileWriter fw = new FileWriter(".\\data\\knapsack_samples\\LOG.csv",true);
-	        	BufferedWriter bw = new BufferedWriter(fw);
+	        	fw = new FileWriter(".\\data\\knapsack_samples\\LOG.csv",true);
+	        	bw = new BufferedWriter(fw);
 	    		//bw.write("Problem,FullTime,GBSize,minGBSize,critPairs,zeroRed\n");
 	    		bw.write(N+","+outp.get(4)+","+outp.get(0)+","+outp.get(3)+",");
-	    		bw.write(outp.get(1)+","+outp.get(2)+","+outp.get(5)+","+outp.get(6)+"\n");
+	    		bw.write(outp.get(1)+","+outp.get(2)+","+outp.get(5)+","+outp.get(6)+",");
+	    		bw.write(outp.get(7)+"\n");
 	    		bw.close();
 	        	
 	        }
@@ -1546,15 +1797,18 @@ private static int[] SolveTransportation(ArrayList<String> outp, String fileName
 		
 		//AutoTransportationTest
 		
-		/*int SAMPLES=1;
+		/*int SAMPLES=5;
 		String latexTableOut = "\\hline\nProblem & FullTime & GBTime & GBSize & MinGBSize & critPairs & ZeroReductions\\\\\n \\hline\n";
 		
 		
-		for(int M=4;M<=10;M++){
-			for(int N=4;N<=10;N++){
+		for(int M=4;M<=12;M++){
+			for(int N=4;N<=12;N++){
+				if(M*N>=90){
+					SAMPLES=2;
+				}else{
+					SAMPLES=5;
+				}
 				
-				FileWriter fw = new FileWriter(".\\data\\transp_samples\\LOG.csv",true);
-				BufferedWriter bw = new BufferedWriter(fw);
 				SampleSeveralTransportation(M,N, SAMPLES);
 				
 				/*try {
@@ -1613,7 +1867,10 @@ private static int[] SolveTransportation(ArrayList<String> outp, String fileName
 							outp.add(""+zeroRed);
 							outp.add(""+gBTime);
 						 * */
-					/*	ArrayList<String> outp=new ArrayList<String>();
+					/*	FileWriter fw = new FileWriter(".\\data\\transp_samples\\LOG.csv",true);
+						BufferedWriter bw = new BufferedWriter(fw);
+						
+						ArrayList<String> outp=new ArrayList<String>();
 						long start = System.currentTimeMillis();
 						ArrayList<VectorBinomial> gB = FindGBTransportation(outp,"./data/transp_samples/samples_"+M+"x"+N+"/"+"transp_"+M+"x"+N+"_0.txt");
 						Vector feasSolution = BuildTranspFeasSol("./data/transp_samples/samples_"+M+"x"+N+"/"+test);
@@ -1622,9 +1879,11 @@ private static int[] SolveTransportation(ArrayList<String> outp, String fileName
 						bw.write(M+","+N+","+(double)(fin)/1000+","+outp.get(3));
 						bw.write(","+outp.get(0)+","+gB.size()+","+outp.get(1)+","+outp.get(2));
 						bw.write("\n");
+						
+						bw.close();
 						//SolveTransportationWithGurobi("./data/transp_samples/"+test);
 					}
-					*/
+					
 					
 					/*System.out.println("GB TOTAL EXEC TIME: "+(System.currentTimeMillis()-start));
 					
@@ -1638,11 +1897,11 @@ private static int[] SolveTransportation(ArrayList<String> outp, String fileName
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				bw.close();
+				
 			}
 		}
-		
-		latexTableOut+="\\hline";
+		*/
+		/*latexTableOut+="\\hline";
 		System.out.println(latexTableOut);
 		*/
 		

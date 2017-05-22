@@ -18,6 +18,9 @@ public class Vector {
 	
 	public static Vector copyVector(Vector vecc,int siz){
 		Vector vec1=new Vector(new int[siz]);
+		for(int i=0;i<siz;i++){
+			vec1.vec[i]=vecc.vec[i];
+		}
 		return vec1;
 	}
 	
